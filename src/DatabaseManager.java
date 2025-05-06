@@ -8,24 +8,43 @@ import java.nio.charset.StandardCharsets;
 
 public class DatabaseManager {
 
-    private final URL baseUrl;
+    private URL baseUrl;
+    private StringBuilder strLog = new StringBuilder();
 
     public DatabaseManager(String strDatabaseURL) throws MalformedURLException {
-        this.baseUrl = new URL(strDatabaseURL);
+        setBaseUrl(strDatabaseURL);
+        updateLog("Initialized DatabaseManager with URL: " + strDatabaseURL);
     }
 
     public DatabaseManager(URL urlDatabase) {
-        this.baseUrl = urlDatabase;
+        setBaseUrl(urlDatabase);
+        updateLog("Initialized DatabaseManager with URL: " + urlDatabase.toString());
     }
 
-    /**
-     * Writes the given JSON string to the specified Firebase node.
-     *
-     * @param nodePath  the RTDB path (e.g. "data.json" or "users/user1.json")
-     * @param jsonData  the JSON payload to send
-     * @return HTTP response code (200 for success)
-     * @throws Exception on network or I/O errors
-     */
+    public void setBaseUrl(String baseUrl) {
+        try {
+            setBaseUrl(new URL(baseUrl));
+            updateLog("Base URL set to: " + baseUrl);
+        } catch (MalformedURLException e) {
+            updateLog("Failed to set base URL: " + baseUrl);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setBaseUrl(URL urlDatabase) {
+        this.baseUrl = urlDatabase;
+        updateLog("Base URL set to: " + urlDatabase.toString());
+    }
+
+    public URL getBaseUrl() {
+        return baseUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "Database URL: " + baseUrl.toString();
+    }
+
     public int writeJson(String nodePath, String jsonData) throws Exception {
         URL nodeUrl = new URL(baseUrl, nodePath);
         HttpURLConnection conn = (HttpURLConnection) nodeUrl.openConnection();
@@ -40,16 +59,10 @@ public class DatabaseManager {
 
         int code = conn.getResponseCode();
         conn.disconnect();
+        updateLog("Wrote JSON to node '" + nodePath + "' with response code: " + code);
         return code;
     }
 
-    /**
-     * Reads the raw JSON payload from the specified Firebase node.
-     *
-     * @param nodePath  the RTDB path (e.g. "data.json" or "users.json")
-     * @return the JSON string returned by Firebase
-     * @throws Exception on network or I/O errors
-     */
     public String readJson(String nodePath) throws Exception {
         URL nodeUrl = new URL(baseUrl, nodePath);
         HttpURLConnection conn = (HttpURLConnection) nodeUrl.openConnection();
@@ -59,6 +72,7 @@ public class DatabaseManager {
         int code = conn.getResponseCode();
         if (code != HttpURLConnection.HTTP_OK) {
             conn.disconnect();
+            updateLog("Failed to read JSON from node '" + nodePath + "'. HTTP code: " + code);
             throw new RuntimeException("GET failed with HTTP code: " + code);
         }
 
@@ -71,6 +85,24 @@ public class DatabaseManager {
             }
         }
         conn.disconnect();
+        updateLog("Read JSON from node '" + nodePath + "' successfully.");
         return result.toString();
+    }
+
+    /**
+     * Appends a log entry with a timestamp to strLog.
+     *
+     * @param message the log message
+     */
+    private void updateLog(String message) {
+        strLog.append("[").append(java.time.LocalDateTime.now()).append("] ")
+                .append(message).append("\n");
+    }
+
+    /**
+     * Returns the current log as a string.
+     */
+    public String getLog() {
+        return strLog.toString();
     }
 }

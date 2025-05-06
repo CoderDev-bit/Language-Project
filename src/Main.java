@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 public class Main {
 
     public static void main(String[] args) {
-        try {
+        /*try {
             // Initialize the DatabaseManager with your Firebase Realtime Database base URL
             String baseUrl = "https://languageproject-67eb8-default-rtdb.europe-west1.firebasedatabase.app/";
             DatabaseManager dmTest = new DatabaseManager(baseUrl);
@@ -23,6 +23,42 @@ public class Main {
             // Read
             String json = dmTest.readJson("data.json");
             System.out.println("READ JSON payload: " + json);
+
+            System.out.println(dmTest.getLog());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+
+        //insertVal();
+
+        /**/
+        try {
+            // 1) Supabase project URL (no path/query)
+            String url = "https://frhgfmnvkopdwpiorszb.supabase.co";
+            // 2) Your anon or service_role key
+            String key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyaGdmbW52a29wZHdwaW9yc3piIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQ5MzI0OCwiZXhwIjoyMDYyMDY5MjQ4fQ.bu7u6Doh9PMWGzpeROtFDm8qnSr5gk56m3vIDllMs7E";
+
+            // initialize manager
+            DatabaseManager1 db = new DatabaseManager1(url, key);
+
+            // 3) Build JSON using your exact column names
+            String payload = "{\n" +
+                    "  \"user_id\": \"George\",\n" +
+                    "  \"message\": \"Hello Supabase2eq2EQq3rq!\"\n" +
+                    "}";
+
+
+            // 4) INSERT into Test
+            int insertCode = db.insertRow("Test", payload);
+            System.out.println("INSERT HTTP code: " + insertCode);
+
+            // 5) READ all rows back
+            String allRows = db.readRows("Test", "?select=*");
+            System.out.println("ROWS JSON: " + allRows);
+
+            // 6) Optional: print your internal log
+            System.out.println("--- LOG ---\n" + db.getLog());
 
         } catch (Exception e) {
             e.printStackTrace();
