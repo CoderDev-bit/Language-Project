@@ -1,108 +1,146 @@
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class DatabaseManager {
 
     private URL baseUrl;
-    private StringBuilder strLog = new StringBuilder();
+    private final String supabaseKey;
+    private final StringBuilder log = new StringBuilder();
 
-    public DatabaseManager(String strDatabaseURL) throws MalformedURLException {
-        setBaseUrl(strDatabaseURL);
-        updateLog("Initialized DatabaseManager with URL: " + strDatabaseURL);
-    }
-
-    public DatabaseManager(URL urlDatabase) {
-        setBaseUrl(urlDatabase);
-        updateLog("Initialized DatabaseManager with URL: " + urlDatabase.toString());
-    }
-
-    public void setBaseUrl(String baseUrl) {
+    public DatabaseManager(String baseUrlString, String supabaseKey) {
         try {
-            setBaseUrl(new URL(baseUrl));
-            updateLog("Base URL set to: " + baseUrl);
+            this.baseUrl = new URL(Objects.requireNonNull(baseUrlString, "Base URL cannot be null"));
+            this.supabaseKey = Objects.requireNonNull(supabaseKey, "Supabase key cannot be null");
+            updateLog("Initialized with URL=" + baseUrlString);
         } catch (MalformedURLException e) {
-            updateLog("Failed to set base URL: " + baseUrl);
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Invalid Supabase URL", e);
         }
     }
 
-    public void setBaseUrl(URL urlDatabase) {
-        this.baseUrl = urlDatabase;
-        updateLog("Base URL set to: " + urlDatabase.toString());
+    public void setBaseUrl(String baseUrlString) {
+        try {
+            setBaseUrl(new URL(baseUrlString));
+        } catch (MalformedURLException e) {
+            updateLog("Failed to set base URL: " + baseUrlString);
+            throw new IllegalArgumentException("Invalid base URL", e);
+        }
+    }
+
+    public void setBaseUrl(URL newUrl) {
+        this.baseUrl = Objects.requireNonNull(newUrl, "Base URL cannot be null");
+        updateLog("Base URL set to: " + newUrl);
     }
 
     public URL getBaseUrl() {
         return baseUrl;
     }
 
-    @Override
-    public String toString() {
-        return "Database URL: " + baseUrl.toString();
-    }
+    public int insertRow(String table, String jsonPayload) throws IOException {
+        Objects.requireNonNull(table, "Table name cannot be null");
+        Objects.requireNonNull(jsonPayload, "JSON payload cannot be null");
 
-    public int writeJson(String nodePath, String jsonData) throws Exception {
-        URL nodeUrl = new URL(baseUrl, nodePath);
-        HttpURLConnection conn = (HttpURLConnection) nodeUrl.openConnection();
-        conn.setRequestMethod("POST"); // or "PUT" for overwrite
-        conn.setRequestProperty("Content-Type", "application/json; utf-8");
+        HttpURLConnection conn = createConnection("/rest/v1/" + table, "POST");
         conn.setDoOutput(true);
 
         try (OutputStream os = conn.getOutputStream()) {
-            byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
-            os.write(input);
+            os.write(jsonPayload.getBytes(StandardCharsets.UTF_8));
         }
 
-        int code = conn.getResponseCode();
+        int responseCode = conn.getResponseCode();
+        updateLog(String.format("INSERT into '%s' → HTTP %d", table, responseCode));
         conn.disconnect();
-        updateLog("Wrote JSON to node '" + nodePath + "' with response code: " + code);
-        return code;
+        return responseCode;
     }
 
-    public String readJson(String nodePath) throws Exception {
-        URL nodeUrl = new URL(baseUrl, nodePath);
-        HttpURLConnection conn = (HttpURLConnection) nodeUrl.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Accept", "application/json");
+    public String readRows(String table, String filters) throws IOException {
+        Objects.requireNonNull(table, "Table name cannot be null");
 
-        int code = conn.getResponseCode();
-        if (code != HttpURLConnection.HTTP_OK) {
+        String path = "/rest/v1/" + table + (filters != null ? filters : "?select=*");
+        HttpURLConnection conn = createConnection(path, "GET");
+
+        int responseCode = conn.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            updateLog(String.format("READ from '%s' failed → HTTP %d", table, responseCode));
             conn.disconnect();
-            updateLog("Failed to read JSON from node '" + nodePath + "'. HTTP code: " + code);
-            throw new RuntimeException("GET failed with HTTP code: " + code);
+            throw new IOException("GET failed with HTTP code: " + responseCode);
         }
 
-        StringBuilder result = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                result.append(line);
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
             }
         }
+
+        updateLog(String.format("READ from '%s' succeeded", table));
         conn.disconnect();
-        updateLog("Read JSON from node '" + nodePath + "' successfully.");
-        return result.toString();
+        return response.toString();
+    }
+
+    private HttpURLConnection createConnection(String path, String method) throws IOException {
+        URL url = new URL(baseUrl, path);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod(method);
+        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestProperty("apikey", supabaseKey);
+        conn.setRequestProperty("Authorization", "Bearer " + supabaseKey);
+        return conn;
     }
 
     /**
-     * Appends a log entry with a timestamp to strLog.
-     *
-     * @param message the log message
+     * Creates a new table in Supabase with two text columns: user_id and message.
+     * Requires your service_role key.
      */
+    public int createTable(String projectRef, String serviceRoleKey,
+                           String tableName) throws Exception {
+        // Management endpoint
+        URL url = new URL(
+                "https://api.supabase.io/v1/projects/"
+                        + projectRef
+                        + "/database/tables"
+        );
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+        conn.setRequestProperty("apikey", serviceRoleKey);
+        conn.setRequestProperty("Authorization", "Bearer " + serviceRoleKey);
+        conn.setDoOutput(true);
+
+        // Define your new table schema here
+        String body = """
+    {
+      "name": "%s",
+      "columns": [
+        { "name": "id",       "type": "bigint", "isIdentity": true, "isPrimaryKey": true },
+        { "name": "user_id",  "type": "text",   "isNullable": false },
+        { "name": "message",  "type": "text",   "isNullable": false },
+        { "name": "created_at", "type": "timestamptz", "default": "now()" }
+      ]
+    }
+    """.formatted(tableName);
+
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(body.getBytes(StandardCharsets.UTF_8));
+        }
+
+        int code = conn.getResponseCode();
+        conn.disconnect();
+        return code;  // 201 = created, 4xx/5xx = error
+    }
+
+
     private void updateLog(String message) {
-        strLog.append("[").append(java.time.LocalDateTime.now()).append("] ")
-                .append(message).append("\n");
+        log.append("[").append(LocalDateTime.now()).append("] ").append(message).append("\n");
     }
 
-    /**
-     * Returns the current log as a string.
-     */
     public String getLog() {
-        return strLog.toString();
+        return log.toString();
     }
 }
