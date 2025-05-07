@@ -19,7 +19,7 @@ public class Main {
             String payload = """
                     {
                       "user_id": "TFiwoFw",
-                      "message": "Not really"
+                      "message": "Not really)))"
                     }
                     """;
 

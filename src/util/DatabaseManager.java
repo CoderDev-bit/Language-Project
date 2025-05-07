@@ -6,123 +6,101 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/**
- * Manages CRUD operations with a Supabase-backed database.
- */
 public class DatabaseManager {
 
     private URL urlDatabase;
     private final String strDBKey;
     private final StringBuilder strLog = new StringBuilder();
 
-    public DatabaseManager(String cfgBaseUrlString, String cfgSupabaseKey) {
+    public DatabaseManager(String baseUrl, String apiKey) {
         try {
-            this.urlDatabase = new URL(Objects.requireNonNull(cfgBaseUrlString, "Base URL cannot be null"));
-            this.strDBKey = Objects.requireNonNull(cfgSupabaseKey, "Supabase key cannot be null");
-            logEvent("Initialized with URL = " + cfgBaseUrlString);
+            this.urlDatabase = new URL(Objects.requireNonNull(baseUrl));
+            this.strDBKey = Objects.requireNonNull(apiKey);
+            logEvent("Initialized with URL = " + baseUrl);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Invalid Supabase URL", e);
         }
     }
 
-    public void setBaseUrl(String cfgBaseUrlString) {
+    public void setBaseUrl(String baseUrl) {
         try {
-            setBaseUrl(new URL(cfgBaseUrlString));
+            setBaseUrl(new URL(baseUrl));
         } catch (MalformedURLException e) {
-            logEvent("Failed to set base URL: " + cfgBaseUrlString);
+            logEvent("Failed to set base URL: " + baseUrl);
             throw new IllegalArgumentException("Invalid base URL", e);
         }
     }
 
-    public void setBaseUrl(URL cfgNewUrl) {
-        this.urlDatabase = Objects.requireNonNull(cfgNewUrl, "Base URL cannot be null");
-        logEvent("Base URL set to: " + cfgNewUrl);
+    public void setBaseUrl(URL newUrl) {
+        this.urlDatabase = Objects.requireNonNull(newUrl);
+        logEvent("Base URL set to: " + newUrl);
     }
 
     public URL getBaseUrl() {
         return urlDatabase;
     }
 
-    /**
-     * Inserts a row into a specified table using JSON payload.
-     *
-     * @param tblName      Table name.
-     * @param reqJsonBody  JSON-formatted payload.
-     * @return HTTP response code.
-     * @throws IOException if the request fails.
-     */
-    public int insertRow(String tblName, String reqJsonBody) throws IOException {
-        Objects.requireNonNull(tblName, "Table name cannot be null");
-        Objects.requireNonNull(reqJsonBody, "JSON payload cannot be null");
-
-        HttpURLConnection reqConn = createConnection("/rest/v1/" + tblName, "POST");
-        reqConn.setDoOutput(true);
-
-        try (OutputStream reqOut = reqConn.getOutputStream()) {
-            reqOut.write(reqJsonBody.getBytes(StandardCharsets.UTF_8));
+    public int insertRow(String table, String json) throws IOException {
+        Objects.requireNonNull(table);
+        Objects.requireNonNull(json);
+        HttpURLConnection conn = createConnection("/rest/v1/" + table, "POST");
+        conn.setDoOutput(true);
+        try (OutputStream out = conn.getOutputStream()) {
+            out.write(json.getBytes(StandardCharsets.UTF_8));
         }
-
-        int resCode = reqConn.getResponseCode();
-        logEvent(String.format("INSERT into '%s' → HTTP %d", tblName, resCode));
-        reqConn.disconnect();
-
-        return resCode;
+        int code = conn.getResponseCode();
+        logEvent(String.format("INSERT into '%s' → HTTP %d", table, code));
+        conn.disconnect();
+        return code;
     }
 
-    /**
-     * Reads rows from a specified table with optional filters.
-     *
-     * @param tblName   Table name.
-     * @param reqFilter Optional query string filter.
-     * @return JSON string of result.
-     * @throws IOException if the request fails.
-     */
-    public String readRows(String tblName, String reqFilter) throws IOException {
-        Objects.requireNonNull(tblName, "Table name cannot be null");
-
-        String reqPath = "/rest/v1/" + tblName + (reqFilter != null ? reqFilter : "?select=*");
-        HttpURLConnection reqConn = createConnection(reqPath, "GET");
-
-        int resCode = reqConn.getResponseCode();
-        if (resCode != HttpURLConnection.HTTP_OK) {
-            logEvent(String.format("READ from '%s' failed → HTTP %d", tblName, resCode));
-            reqConn.disconnect();
-            throw new IOException("GET failed with HTTP code: " + resCode);
+    public String readRows(String table, String filter) throws IOException {
+        Objects.requireNonNull(table);
+        String path = "/rest/v1/" + table + (filter != null ? filter : "?select=*");
+        HttpURLConnection conn = createConnection(path, "GET");
+        int code = conn.getResponseCode();
+        if (code != HttpURLConnection.HTTP_OK) {
+            logEvent(String.format("READ from '%s' failed → HTTP %d", table, code));
+            conn.disconnect();
+            throw new IOException("GET failed with HTTP code: " + code);
         }
-
-        StringBuilder resJson = new StringBuilder();
-        try (BufferedReader resReader = new BufferedReader(
-                new InputStreamReader(reqConn.getInputStream(), StandardCharsets.UTF_8))) {
+        StringBuilder res = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
-            while ((line = resReader.readLine()) != null) {
-                resJson.append(line);
-            }
+            while ((line = reader.readLine()) != null) res.append(line);
         }
-
-        logEvent(String.format("READ from '%s' succeeded", tblName));
-        reqConn.disconnect();
-
-        return resJson.toString();
+        logEvent(String.format("READ from '%s' succeeded", table));
+        conn.disconnect();
+        return res.toString();
     }
 
-    /**
-     * Creates a table using Supabase Management API.
-     *
-     * @param cfgProjectRef      Supabase project reference ID.
-     * @param cfgServiceRoleKey  Service role API key.
-     * @param tblName            Desired table name.
-     * @return HTTP response code.
-     * @throws IOException if creation fails.
-     */
-    public int createTable(String tblName) throws IOException {
+    public int createTable(String table) throws IOException {
+        String sql = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id BIGSERIAL PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMPTZ DEFAULT now()
+            );
+        """.formatted(table);
+        HttpURLConnection conn = createConnection("/rest/v1/rpc/execute_sql", "POST");
+        conn.setDoOutput(true);
+        String body = "{\"sql\": " + escapeJsonString(sql) + "}";
+        try (OutputStream out = conn.getOutputStream()) {
+            out.write(body.getBytes(StandardCharsets.UTF_8));
+        }
+        int code = conn.getResponseCode();
+        logEvent(String.format("EXECUTE SQL to create table '%s' → HTTP %d", table, code));
+        conn.disconnect();
+        return code;
+    }
+
+    public String[] listTables() throws IOException {
         String sqlStatement = """
-        CREATE TABLE IF NOT EXISTS %s (
-            id BIGSERIAL PRIMARY KEY,
-            user_id TEXT NOT NULL,
-            message TEXT NOT NULL,
-            created_at TIMESTAMPTZ DEFAULT now()
-        );
-        """.formatted(tblName);
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
+        """;
 
         HttpURLConnection reqConn = createConnection("/rest/v1/rpc/execute_sql", "POST");
         reqConn.setDoOutput(true);
@@ -138,25 +116,55 @@ public class DatabaseManager {
         }
 
         int resCode = reqConn.getResponseCode();
-        logEvent(String.format("EXECUTE SQL to create table '%s' → HTTP %d", tblName, resCode));
+        if (resCode != HttpURLConnection.HTTP_OK) {
+            logEvent(String.format("LIST TABLES failed → HTTP %d", resCode));
+            reqConn.disconnect();
+            throw new IOException("Failed to list tables → HTTP " + resCode);
+        }
+
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(reqConn.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        }
+
         reqConn.disconnect();
 
-        return resCode;
+        // Parse JSON manually (since we avoid libraries)
+        return extractTableNames(response.toString());
     }
 
-    // Escapes quotes/newlines for JSON compatibility
+    private String[] extractTableNames(String json) {
+        // Example response: [{"table_name":"messages"},{"table_name":"users"}]
+        json = json.trim();
+        if (!json.startsWith("[") || !json.endsWith("]")) return new String[0];
+
+        json = json.substring(1, json.length() - 1); // remove [ and ]
+        if (json.trim().isEmpty()) return new String[0];
+
+        String[] items = json.split("\\},\\{"); // split objects
+        for (int i = 0; i < items.length; i++) {
+            items[i] = items[i].replaceAll(".*\"table_name\":\"", "")
+                    .replaceAll("\".*", "");
+        }
+        return items;
+    }
+
+
+
     private String escapeJsonString(String input) {
-        return "\"" + input
-                .replace("\\", "\\\\")
+        return "\"" + input.replace("\\", "\\\\")
                 .replace("\"", "\\\"")
                 .replace("\n", "\\n")
                 .replace("\r", "") + "\"";
     }
 
-    private HttpURLConnection createConnection(String reqPath, String reqMethod) throws IOException {
-        URL reqUrl = new URL(urlDatabase, reqPath);
-        HttpURLConnection conn = (HttpURLConnection) reqUrl.openConnection();
-        conn.setRequestMethod(reqMethod);
+    private HttpURLConnection createConnection(String path, String method) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) new URL(urlDatabase, path).openConnection();
+        conn.setRequestMethod(method);
         conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
         conn.setRequestProperty("Accept", "application/json");
         conn.setRequestProperty("apikey", strDBKey);
