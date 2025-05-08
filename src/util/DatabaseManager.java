@@ -77,7 +77,7 @@ public class DatabaseManager {
 
     public int createTable(String table) throws IOException {
         String sql = """
-            CREATE TABLE IF NOT EXISTS %s (
+            CREATE TABLE IF NOT EXISTS "%s" (
                 id BIGSERIAL PRIMARY KEY,
                 user_id TEXT NOT NULL,
                 message TEXT NOT NULL,
