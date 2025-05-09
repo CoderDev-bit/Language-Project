@@ -18,7 +18,7 @@ public class Main {
             // initialize manager
             DatabaseManager db = new DatabaseManager(url, key);
 
-            int code = db.createTable("myTaBle1");
+            int code = db.createTable("mYTABle1");
             System.out.println("CREATE TABLE HTTP code: " + code);
 
             // 3) Build JSON using your exact column names
@@ -31,19 +31,18 @@ public class Main {
 
 
             // 4) INSERT into Test
-            int insertCode = db.insertRow("myTable1", payload);
+            int insertCode = db.insertRow("mYTABle1", payload);
             System.out.println("INSERT HTTP code: " + insertCode);
 
             // 5) READ all rows back
-            String allRows = db.readRows("myTable1", "?select=*");
+            String allRows = db.readRows("mYTABle1", "?select=*");
             System.out.println("ROWS JSON: " + allRows);
 
             // 6) Optional: print your internal log
             System.out.println("--- LOG ---\n" + db.getLog());
 
-            String[] test = db.listTables();
-            List<String> testList = Arrays.asList(test);
-            System.out.println(testList);
+            String test = db.listTables();
+            System.out.println(test);
 
         } catch (Exception e) {
             e.printStackTrace();

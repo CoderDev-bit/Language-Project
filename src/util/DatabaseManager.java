@@ -96,23 +96,22 @@ public class DatabaseManager {
         return code;
     }
 
-    public String[] listTables() throws IOException {
-        String sqlStatement = """
-        SELECT table_name FROM information_schema.tables
-        WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
-        """;
+    public String listTables() throws IOException {
+        // The URL is hardcoded here, consider making this dynamic or using the base URL
+        // if the RPC endpoint structure is consistent.
+        String url = "https://frhgfmnvkopdwpiorszb.supabase.co/rest/v1/rpc/list_public_tables";
 
-        HttpURLConnection reqConn = createConnection("/rest/v1/rpc/execute_sql", "POST");
+        HttpURLConnection reqConn = (HttpURLConnection) new URL(url).openConnection();
+        reqConn.setRequestMethod("POST");
+        reqConn.setRequestProperty("apikey", strDBKey);
+        reqConn.setRequestProperty("Authorization", "Bearer " + strDBKey);
+        reqConn.setRequestProperty("Content-Type", "application/json");
+        reqConn.setRequestProperty("Accept", "application/json");
         reqConn.setDoOutput(true);
 
-        String reqBody = """
-        {
-          "sql": %s
-        }
-        """.formatted(escapeJsonString(sqlStatement));
-
-        try (OutputStream reqOut = reqConn.getOutputStream()) {
-            reqOut.write(reqBody.getBytes(StandardCharsets.UTF_8));
+        // The function takes no input, but Supabase requires "{}" in the body
+        try (OutputStream os = reqConn.getOutputStream()) {
+            os.write("{}".getBytes(StandardCharsets.UTF_8));
         }
 
         int resCode = reqConn.getResponseCode();
@@ -132,26 +131,12 @@ public class DatabaseManager {
         }
 
         reqConn.disconnect();
+        // Add log message here after successful operation
+        logEvent("LIST TABLES succeeded.");
 
-        // Parse JSON manually (since we avoid libraries)
-        return extractTableNames(response.toString());
+        return response.toString();
     }
 
-    private String[] extractTableNames(String json) {
-        // Example response: [{"table_name":"messages"},{"table_name":"users"}]
-        json = json.trim();
-        if (!json.startsWith("[") || !json.endsWith("]")) return new String[0];
-
-        json = json.substring(1, json.length() - 1); // remove [ and ]
-        if (json.trim().isEmpty()) return new String[0];
-
-        String[] items = json.split("\\},\\{"); // split objects
-        for (int i = 0; i < items.length; i++) {
-            items[i] = items[i].replaceAll(".*\"table_name\":\"", "")
-                    .replaceAll("\".*", "");
-        }
-        return items;
-    }
 
 
 
@@ -171,6 +156,8 @@ public class DatabaseManager {
         conn.setRequestProperty("Authorization", "Bearer " + strDBKey);
         return conn;
     }
+
+
 
     private void logEvent(String msg) {
         strLog.append("[").append(LocalDateTime.now()).append("] ").append(msg).append("\n");
