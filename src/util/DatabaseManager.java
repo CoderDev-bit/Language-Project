@@ -6,11 +6,23 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import java.nio.file.*;
+import java.io.IOException;
+import java.io.BufferedWriter;
+import java.nio.file.StandardOpenOption;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class DatabaseManager {
 
     private URL urlDatabase;
     private final String strDBKey;
     private final StringBuilder strLog = new StringBuilder();
+
+    // no just file loggign yet
+    private boolean isEventLoggingEnabled = false; // Controls overall logging (memory and file)
+    private Path logFilePath = null; // Null means no file logging
+    private final Lock fileLogLock = new ReentrantLock(); // For thread-safe file writing
 
     public DatabaseManager(String baseUrl, String apiKey) {
         try {
@@ -159,8 +171,94 @@ public class DatabaseManager {
 
 
 
+    /**
+     * Toggles the overall logging state between OFF and MEMORY_ONLY.
+     * If file logging is currently active, calling this method will disable both
+     * file and memory logging. If logging is currently off, it enables memory-only logging.
+     */
+    public void toggleLogging() {
+        if (this.isEventLoggingEnabled) {
+            // If logging is currently on (either memory or file), turn it off
+            this.isEventLoggingEnabled = false;
+            this.logFilePath = null; // Ensure file logging is also turned off
+            // Optional: Log this event before disabling
+            logEvent("Event logging disabled."); // This call will now respect the flag (won't log)
+        } else {
+            // If logging is currently off, enable memory-only logging
+            this.isEventLoggingEnabled = true;
+            this.logFilePath = null; // Ensure file logging is off
+            // Optional: Log this event after enabling
+            logEvent("Event logging enabled to memory."); // This call will now respect the flag (will log)
+        }
+    }
+
+    /**
+     * Toggles file logging to a specified text file.
+     * If file logging is currently active for the given path, it disables file logging
+     * (memory logging state remains unchanged). If file logging is off for this path,
+     * it enables file logging to the path and ensures overall logging is enabled
+     * (which also enables memory logging).
+     * Creates the file and parent directories if they don't exist when enabling.
+     *
+     * @param strFilePath The path to the log file as a String. Can be null or empty to disable file logging.
+     * @throws IOException If an I/O error occurs creating directories or accessing the file when enabling.
+     */
+    public void toggleLogging(String strFilePath) throws IOException {
+        if (strFilePath == null || strFilePath.trim().isEmpty()) {
+            // If null or empty path, disable file logging
+            if (this.logFilePath != null) {
+                logEvent("File logging disabled."); // Log before unsetting path
+            }
+            this.logFilePath = null;
+            // isEventLoggingEnabled remains unchanged - memory logging might still be active
+        } else {
+            Path newFilePath = Paths.get(strFilePath);
+            if (this.logFilePath != null && this.logFilePath.equals(newFilePath)) {
+                // If already logging to this file, toggle off file logging
+                logEvent("File logging disabled for path: " + strFilePath); // Log before unsetting path
+                this.logFilePath = null;
+                // isEventLoggingEnabled remains unchanged - memory logging might still be active
+            } else {
+                // If not logging to this file, enable file logging to the new path
+                Path parentDir = newFilePath.getParent();
+                if (parentDir != null) { // <-- Add this null check!
+                    Files.createDirectories(parentDir); // Ensure parent directories exist ONLY if there's a parent
+                }
+
+                if (!Files.exists(newFilePath)) {
+                    Files.createFile(newFilePath); // Create the file if it doesn't exist
+                }
+                this.logFilePath = newFilePath;
+                this.isEventLoggingEnabled = true; // Ensure overall logging is enabled for file logging
+                logEvent("File logging enabled to path: " + strFilePath); // Log after setting path
+            }
+        }
+    }
+
     private void logEvent(String msg) {
-        strLog.append("[").append(LocalDateTime.now()).append("] ").append(msg).append("\n");
+        // Check if logging is enabled first
+        if (!isEventLoggingEnabled) return; // Exit immediately if logging is not enabled
+
+        String formattedMsg = "[" + LocalDateTime.now() + "] " + msg + "\n";
+
+        // Always log to memory if overall logging is enabled
+        strLog.append(formattedMsg);
+
+        // Log to file only if a file path is set
+        if (logFilePath != null) {
+            fileLogLock.lock(); // Acquire lock for thread safety
+            try (BufferedWriter writer = Files.newBufferedWriter(logFilePath, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+                writer.write(formattedMsg);
+            } catch (IOException e) {
+                // Handle file logging error - this error itself might not be logged
+                // to avoid recursion or further errors. Print to standard error.
+                System.err.println("Error writing to log file " + logFilePath + ": " + e.getMessage());
+                // Optionally unset the log file path if writing fails repeatedly
+                // this.logFilePath = null;
+            } finally {
+                fileLogLock.unlock(); // Release lock
+            }
+        }
     }
 
     public String getLog() {
