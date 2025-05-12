@@ -1,12 +1,12 @@
 package lang;
 
-import util.DatabaseManager;
+import util.DatabaseManager1;
 
 public class LanguageModel {
 
-    DatabaseManager db;
+    DatabaseManager1 db;
 
-    public LanguageModel(DatabaseManager db) {
+    public LanguageModel(DatabaseManager1 db) {
 
     }
 
@@ -14,7 +14,7 @@ public class LanguageModel {
 
     }
 
-    public void detect(String strText){
+    public void analyze(String strText){
 
     }
 

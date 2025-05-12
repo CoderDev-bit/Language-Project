@@ -3,27 +3,31 @@ package util;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import java.nio.file.*;
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.nio.file.StandardOpenOption;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DatabaseManager {
-
     private URL urlDatabase;
     private final String strDBKey;
     private final StringBuilder strLog = new StringBuilder();
 
-    // no just file loggign yet
-    private boolean isEventLoggingEnabled = false; // Controls overall logging (memory and file)
-    private Path logFilePath = null; // Null means no file logging
-    private final Lock fileLogLock = new ReentrantLock(); // For thread-safe file writing
+    // Logging fields
+    private boolean isEventLoggingEnabled = false;
+    private Path logFilePath = null;
+    private final Lock fileLogLock = new ReentrantLock();
 
+    // SQL templates for common operations
+    public static final String SQL_INSERT_ROW_TEMPLATE   = "INSERT INTO \"%s\" (%s) VALUES (%s);";
+    public static final String SQL_READ_ROWS_TEMPLATE    = "SELECT * FROM \"%s\"%s;";
+    public static final String SQL_CREATE_TABLE_TEMPLATE = "CREATE TABLE IF NOT EXISTS \"%s\" (id BIGSERIAL PRIMARY KEY, %s);";
+    public static final String SQL_LIST_TABLES           = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';";
+
+    /**
+     * Initialize with Supabase base URL and API key.
+     */
     public DatabaseManager(String baseUrl, String apiKey) {
         try {
             this.urlDatabase = new URL(Objects.requireNonNull(baseUrl));
@@ -34,105 +38,76 @@ public class DatabaseManager {
         }
     }
 
-    public void setBaseUrl(String baseUrl) {
-        try {
-            setBaseUrl(new URL(baseUrl));
-        } catch (MalformedURLException e) {
-            logEvent("Failed to set base URL: " + baseUrl);
-            throw new IllegalArgumentException("Invalid base URL", e);
-        }
-    }
-
-    public void setBaseUrl(URL newUrl) {
-        this.urlDatabase = Objects.requireNonNull(newUrl);
-        logEvent("Base URL set to: " + newUrl);
-    }
-
-    public URL getBaseUrl() {
-        return urlDatabase;
-    }
-
-    public int insertRow(String table, String json) throws IOException {
-        Objects.requireNonNull(table);
-        Objects.requireNonNull(json);
-        HttpURLConnection conn = createConnection("/rest/v1/" + table, "POST");
+    /**
+     * Execute INSERT/UPDATE/DELETE/DDL SQL via Supabase RPC.
+     * @param sql the SQL statement to execute
+     * @return HTTP response code
+     */
+    public int executeUpdate(String sql) throws IOException {
+        String payload = "{\"sql\":\"" + sql.replace("\"", "\\\"") + "\"}";
+        HttpURLConnection conn = createConnection("/rest/v1/rpc/execute_sql", "POST");
         conn.setDoOutput(true);
         try (OutputStream out = conn.getOutputStream()) {
-            out.write(json.getBytes(StandardCharsets.UTF_8));
+            out.write(payload.getBytes(StandardCharsets.UTF_8));
         }
         int code = conn.getResponseCode();
-        logEvent(String.format("INSERT into '%s' → HTTP %d", table, code));
+        logEvent(String.format("EXECUTE_UPDATE HTTP %d; SQL: %s", code, sql));
         conn.disconnect();
         return code;
     }
 
-    public String readRows(String table, String filter) throws IOException {
-        Objects.requireNonNull(table);
-        String path = "/rest/v1/" + table + (filter != null ? filter : "?select=*");
-        HttpURLConnection conn = createConnection(path, "GET");
+    /**
+     * Execute SELECT SQL via Supabase RPC and return JSON result.
+     * @param sql the SELECT statement to execute
+     * @return JSON string of query result
+     */
+    public String executeQuery(String sql) throws IOException {
+        String payload = "{\"sql\":\"" + sql.replace("\"", "\\\"") + "\"}";
+        HttpURLConnection conn = createConnection("/rest/v1/rpc/execute_sql", "POST");
+        conn.setDoOutput(true);
+        try (OutputStream out = conn.getOutputStream()) {
+            out.write(payload.getBytes(StandardCharsets.UTF_8));
+        }
         int code = conn.getResponseCode();
         if (code != HttpURLConnection.HTTP_OK) {
-            logEvent(String.format("READ from '%s' failed → HTTP %d", table, code));
+            logEvent(String.format("EXECUTE_QUERY failed HTTP %d; SQL: %s", code, sql));
             conn.disconnect();
-            throw new IOException("GET failed with HTTP code: " + code);
+            throw new IOException("Query failed with HTTP code: " + code);
         }
         StringBuilder res = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
-            while ((line = reader.readLine()) != null) res.append(line);
+            while ((line = reader.readLine()) != null) {
+                res.append(line);
+            }
         }
-        logEvent(String.format("READ from '%s' succeeded", table));
+        logEvent(String.format("EXECUTE_QUERY succeeded; SQL: %s", sql));
         conn.disconnect();
         return res.toString();
     }
 
-    public int createTable(String table) throws IOException {
-        String sql = """
-            CREATE TABLE IF NOT EXISTS "%s" (
-                id BIGSERIAL PRIMARY KEY,
-                user_id TEXT NOT NULL,
-                message TEXT NOT NULL,
-                created_at TIMESTAMPTZ DEFAULT now()
-            );
-        """.formatted(table);
-        HttpURLConnection conn = createConnection("/rest/v1/rpc/execute_sql", "POST");
-        conn.setDoOutput(true);
-        String body = "{\"sql\": " + escapeJsonString(sql) + "}";
-        try (OutputStream out = conn.getOutputStream()) {
-            out.write(body.getBytes(StandardCharsets.UTF_8));
-        }
-        int code = conn.getResponseCode();
-        logEvent(String.format("EXECUTE SQL to create table '%s' → HTTP %d", table, code));
-        conn.disconnect();
-        return code;
-    }
-
+    /**
+     * List all public tables via Supabase RPC (uses specialized connection setup).
+     */
     public String listTables() throws IOException {
-        // The URL is hardcoded here, consider making this dynamic or using the base URL
-        // if the RPC endpoint structure is consistent.
-        String url = "https://frhgfmnvkopdwpiorszb.supabase.co/rest/v1/rpc/list_public_tables";
-
-        HttpURLConnection reqConn = (HttpURLConnection) new URL(url).openConnection();
+        URL listUrl = new URL(urlDatabase, "/rest/v1/rpc/list_public_tables");
+        HttpURLConnection reqConn = (HttpURLConnection) listUrl.openConnection();
         reqConn.setRequestMethod("POST");
         reqConn.setRequestProperty("apikey", strDBKey);
         reqConn.setRequestProperty("Authorization", "Bearer " + strDBKey);
         reqConn.setRequestProperty("Content-Type", "application/json");
         reqConn.setRequestProperty("Accept", "application/json");
         reqConn.setDoOutput(true);
-
-        // The function takes no input, but Supabase requires "{}" in the body
         try (OutputStream os = reqConn.getOutputStream()) {
             os.write("{}".getBytes(StandardCharsets.UTF_8));
         }
-
-        int resCode = reqConn.getResponseCode();
-        if (resCode != HttpURLConnection.HTTP_OK) {
-            logEvent(String.format("LIST TABLES failed → HTTP %d", resCode));
+        int code = reqConn.getResponseCode();
+        if (code != HttpURLConnection.HTTP_OK) {
+            logEvent(String.format("LIST_TABLES failed HTTP %d", code));
             reqConn.disconnect();
-            throw new IOException("Failed to list tables → HTTP " + resCode);
+            throw new IOException("Failed to list tables HTTP " + code);
         }
-
         StringBuilder response = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(reqConn.getInputStream(), StandardCharsets.UTF_8))) {
@@ -141,24 +116,14 @@ public class DatabaseManager {
                 response.append(line);
             }
         }
-
+        logEvent("LIST_TABLES succeeded.");
         reqConn.disconnect();
-        // Add log message here after successful operation
-        logEvent("LIST TABLES succeeded.");
-
         return response.toString();
     }
 
-
-
-
-    private String escapeJsonString(String input) {
-        return "\"" + input.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "") + "\"";
-    }
-
+    /**
+     * Helper to create a standard supabase REST connection.
+     */
     private HttpURLConnection createConnection(String path, String method) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(urlDatabase, path).openConnection();
         conn.setRequestMethod(method);
@@ -169,99 +134,55 @@ public class DatabaseManager {
         return conn;
     }
 
-
-
-    /**
-     * Toggles the overall logging state between OFF and MEMORY_ONLY.
-     * If file logging is currently active, calling this method will disable both
-     * file and memory logging. If logging is currently off, it enables memory-only logging.
-     */
-    public void toggleLogging() {
-        if (this.isEventLoggingEnabled) {
-            // If logging is currently on (either memory or file), turn it off
-            this.isEventLoggingEnabled = false;
-            this.logFilePath = null; // Ensure file logging is also turned off
-            // Optional: Log this event before disabling
-            logEvent("Event logging disabled."); // This call will now respect the flag (won't log)
-        } else {
-            // If logging is currently off, enable memory-only logging
-            this.isEventLoggingEnabled = true;
-            this.logFilePath = null; // Ensure file logging is off
-            // Optional: Log this event after enabling
-            logEvent("Event logging enabled to memory."); // This call will now respect the flag (will log)
-        }
-    }
-
-    /**
-     * Toggles file logging to a specified text file.
-     * If file logging is currently active for the given path, it disables file logging
-     * (memory logging state remains unchanged). If file logging is off for this path,
-     * it enables file logging to the path and ensures overall logging is enabled
-     * (which also enables memory logging).
-     * Creates the file and parent directories if they don't exist when enabling.
-     *
-     * @param strFilePath The path to the log file as a String. Can be null or empty to disable file logging.
-     * @throws IOException If an I/O error occurs creating directories or accessing the file when enabling.
-     */
-    public void toggleLogging(String strFilePath) throws IOException {
-        if (strFilePath == null || strFilePath.trim().isEmpty()) {
-            // If null or empty path, disable file logging
-            if (this.logFilePath != null) {
-                logEvent("File logging disabled."); // Log before unsetting path
-            }
-            this.logFilePath = null;
-            // isEventLoggingEnabled remains unchanged - memory logging might still be active
-        } else {
-            Path newFilePath = Paths.get(strFilePath);
-            if (this.logFilePath != null && this.logFilePath.equals(newFilePath)) {
-                // If already logging to this file, toggle off file logging
-                logEvent("File logging disabled for path: " + strFilePath); // Log before unsetting path
-                this.logFilePath = null;
-                // isEventLoggingEnabled remains unchanged - memory logging might still be active
-            } else {
-                // If not logging to this file, enable file logging to the new path
-                Path parentDir = newFilePath.getParent();
-                if (parentDir != null) { // <-- Add this null check!
-                    Files.createDirectories(parentDir); // Ensure parent directories exist ONLY if there's a parent
-                }
-
-                if (!Files.exists(newFilePath)) {
-                    Files.createFile(newFilePath); // Create the file if it doesn't exist
-                }
-                this.logFilePath = newFilePath;
-                this.isEventLoggingEnabled = true; // Ensure overall logging is enabled for file logging
-                logEvent("File logging enabled to path: " + strFilePath); // Log after setting path
-            }
-        }
-    }
-
+    // Simplified logging methods
     private void logEvent(String msg) {
-        // Check if logging is enabled first
-        if (!isEventLoggingEnabled) return; // Exit immediately if logging is not enabled
-
-        String formattedMsg = "[" + LocalDateTime.now() + "] " + msg + "\n";
-
-        // Always log to memory if overall logging is enabled
-        strLog.append(formattedMsg);
-
-        // Log to file only if a file path is set
+        if (!isEventLoggingEnabled) return;
+        String entry = "[" + LocalDateTime.now() + "] " + msg + "\n";
+        strLog.append(entry);
         if (logFilePath != null) {
-            fileLogLock.lock(); // Acquire lock for thread safety
-            try (BufferedWriter writer = Files.newBufferedWriter(logFilePath, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
-                writer.write(formattedMsg);
-            } catch (IOException e) {
-                // Handle file logging error - this error itself might not be logged
-                // to avoid recursion or further errors. Print to standard error.
-                System.err.println("Error writing to log file " + logFilePath + ": " + e.getMessage());
-                // Optionally unset the log file path if writing fails repeatedly
-                // this.logFilePath = null;
+            fileLogLock.lock();
+            try (BufferedWriter w = Files.newBufferedWriter(logFilePath, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+                w.write(entry);
+            } catch (IOException ignored) {
             } finally {
-                fileLogLock.unlock(); // Release lock
+                fileLogLock.unlock();
             }
         }
     }
+    public String getLog() { return strLog.toString(); }
 
-    public String getLog() {
-        return strLog.toString();
+    /**
+     * Demonstration main method to test basic operations.
+     */
+    public static void main(String[] args) {
+        final String BASE_URL = "https://frhgfmnvkopdwpiorszb.supabase.co";
+        final String API_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyaGdmbW52a29wZHdwaW9yc3piIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQ5MzI0OCwiZXhwIjoyMDYyMDY5MjQ4fQ.bu7u6Doh9PMWGzpeROtFDm8qnSr5gk56m3vIDllMs7E";
+        final String TABLE    = "demo_table";
+
+        try {
+            DatabaseManager db = new DatabaseManager(BASE_URL, API_KEY);
+
+            // 1. Create table
+            String cols = "data TEXT NOT NULL";
+            String sqlCreate = String.format(SQL_CREATE_TABLE_TEMPLATE, TABLE, cols);
+            System.out.println("Create table response: " + db.executeUpdate(sqlCreate));
+
+            // 2. Insert a row
+            String sqlInsert = String.format(SQL_INSERT_ROW_TEMPLATE, TABLE, "data", "'Hello, World!'"
+            );
+            System.out.println("Insert row response: " + db.executeUpdate(sqlInsert));
+
+            // 3. Read rows
+            String sqlSelect = String.format(SQL_READ_ROWS_TEMPLATE, TABLE, "");
+            String rows = db.executeQuery(sqlSelect);
+            System.out.println("Read rows result: " + rows);
+
+            // 4. List tables
+            String tableList = db.listTables();
+            System.out.println("List tables: " + tableList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
