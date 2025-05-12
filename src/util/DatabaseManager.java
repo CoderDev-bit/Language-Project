@@ -69,7 +69,7 @@ public class DatabaseManager {
             out.write(payload.getBytes(StandardCharsets.UTF_8));
         }
         int code = conn.getResponseCode();
-        if (code != HttpURLConnection.HTTP_OK) {
+        if (code != HttpURLConnection.HTTP_OK && code != HttpURLConnection.HTTP_NO_CONTENT) {
             logEvent(String.format("EXECUTE_QUERY failed HTTP %d; SQL: %s", code, sql));
             conn.disconnect();
             throw new IOException("Query failed with HTTP code: " + code);
@@ -91,35 +91,30 @@ public class DatabaseManager {
      * List all public tables via Supabase RPC (uses specialized connection setup).
      */
     public String listTables() throws IOException {
-        URL listUrl = new URL(urlDatabase, "/rest/v1/rpc/list_public_tables");
-        HttpURLConnection reqConn = (HttpURLConnection) listUrl.openConnection();
-        reqConn.setRequestMethod("POST");
-        reqConn.setRequestProperty("apikey", strDBKey);
-        reqConn.setRequestProperty("Authorization", "Bearer " + strDBKey);
-        reqConn.setRequestProperty("Content-Type", "application/json");
-        reqConn.setRequestProperty("Accept", "application/json");
-        reqConn.setDoOutput(true);
-        try (OutputStream os = reqConn.getOutputStream()) {
-            os.write("{}".getBytes(StandardCharsets.UTF_8));
+        HttpURLConnection conn = createConnection("/rest/v1/rpc/list_public_tables", "POST");
+        conn.setDoOutput(true);
+        try (OutputStream out = conn.getOutputStream()) {
+            out.write("{}".getBytes(StandardCharsets.UTF_8));
         }
-        int code = reqConn.getResponseCode();
+        int code = conn.getResponseCode();
         if (code != HttpURLConnection.HTTP_OK) {
             logEvent(String.format("LIST_TABLES failed HTTP %d", code));
-            reqConn.disconnect();
+            conn.disconnect();
             throw new IOException("Failed to list tables HTTP " + code);
         }
         StringBuilder response = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(reqConn.getInputStream(), StandardCharsets.UTF_8))) {
+                new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 response.append(line);
             }
         }
         logEvent("LIST_TABLES succeeded.");
-        reqConn.disconnect();
+        conn.disconnect();
         return response.toString();
     }
+
 
     /**
      * Helper to create a standard supabase REST connection.
@@ -179,7 +174,11 @@ public class DatabaseManager {
 
             // 4. List tables
             String tableList = db.listTables();
-            System.out.println("List tables: " + tableList);
+            String result = db.executeQuery("SELECT * FROM table_list;");
+
+
+
+            System.out.println("List tables: " + result);
 
         } catch (Exception e) {
             e.printStackTrace();
