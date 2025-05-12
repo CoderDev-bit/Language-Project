@@ -1,5 +1,6 @@
 //imports for the database stuff
 
+import ui.GUI;
 import util.DatabaseManager1;
 
 import java.io.IOException;
@@ -8,7 +9,7 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) {
-        try {
+        /*try {
             // 1) Supabase project URL (no path/query)
             DatabaseManager1 db = getDatabaseManager();
 
@@ -40,7 +41,8 @@ public class Main {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
+        new GUI();
     }
 
     private static DatabaseManager1 getDatabaseManager() throws IOException {

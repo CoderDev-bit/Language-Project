@@ -8,6 +8,7 @@ public class LanguageModel {
 
     public LanguageModel(DatabaseManager1 db) {
 
+
     }
 
     public void train(String strLanguageName, String strText) {
