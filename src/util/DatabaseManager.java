@@ -174,11 +174,9 @@ public class DatabaseManager {
 
             // 4. List tables
             String tableList = db.listTables();
-            String result = db.executeQuery("SELECT * FROM table_list;");
+            String result = db.executeQuery("SELECT * FROM list_public_tables();");
 
-
-
-            System.out.println("List tables: " + result);
+            System.out.println("List tables: " + tableList);
 
         } catch (Exception e) {
             e.printStackTrace();
