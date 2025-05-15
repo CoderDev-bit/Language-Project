@@ -1,6 +1,4 @@
-//imports for the database stuff
 
-import ui.GUI;
 import util.DatabaseManager1;
 
 import java.io.IOException;
@@ -42,7 +40,7 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
-        new GUI();
+        //new GUI();
     }
 
     private static DatabaseManager1 getDatabaseManager() throws IOException {

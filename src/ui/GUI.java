@@ -1,93 +1,46 @@
+//DO NOT DELETE THIS: "eq8q9!&shuiq"
+
 package ui;
+
+import ui.tabs.*;
 
 import javax.swing.*;
 import java.awt.*;
+import static javax.swing.UIManager.getLookAndFeelDefaults;
+import static javax.swing.UIManager.getSystemLookAndFeelClassName;
+import static ui.tabs.BaseTab.BACKGROUND;
 
-public class GUI extends JFrame {
+public class GUI {
+
+    private static final String strVideoLink = "https://www.youtube.com/watch?v=8yh9BPUBbbQ";
+
+    private JFrame frmMain;
 
     public GUI() {
-        setTitle("Language Detector & Caesar Cipher Tool");
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
 
-        // Create tabbed pane
+        frmMain = new JFrame("Language Detector & Caesar Cipher Tool");
+        frmMain.setBounds(5,5,600,500);
+        frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frmMain.setResizable(false);
+
         JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 14));
+        tabbedPane.setBackground(BACKGROUND);
 
-        // Add tabs
-        tabbedPane.add("Trainer", createTrainerTab());
-        tabbedPane.add("Detector", createDetectorTab());
-        tabbedPane.add("Caesar Tool", createCaesarToolTab());
-        tabbedPane.add("Cracker", createCrackerTab());
-        tabbedPane.add("Tutorial", createTutorialTab());
+        tabbedPane.add("Trainer", new TrainerTab());
+        tabbedPane.add("Detector", new DetectorTab());
+        tabbedPane.add("Caesar Tool", new CaesarToolTab());
+        tabbedPane.add("Cracker", new CrackerTab());
+        tabbedPane.add("Tutorial", new TutorialTab());
 
-        add(tabbedPane);
-        setVisible(true);
+        frmMain.add(tabbedPane);
+        frmMain.setVisible(true);
+
     }
 
-    private JPanel createTrainerTab() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JTextArea textArea = new JTextArea("Load and train language profiles here.");
-        JButton loadButton = new JButton("Load Training File");
-        panel.add(new JLabel("Trainer"), BorderLayout.NORTH);
-        panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
-        panel.add(loadButton, BorderLayout.SOUTH);
-        return panel;
-    }
 
-    private JPanel createDetectorTab() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JTextArea inputArea = new JTextArea("Paste text here to detect language.");
-        JButton detectButton = new JButton("Detect Language");
-        JLabel resultLabel = new JLabel("Detected Language: ");
-        panel.add(new JLabel("Language Detector"), BorderLayout.NORTH);
-        panel.add(new JScrollPane(inputArea), BorderLayout.CENTER);
-        JPanel bottom = new JPanel(new BorderLayout());
-        bottom.add(detectButton, BorderLayout.WEST);
-        bottom.add(resultLabel, BorderLayout.CENTER);
-        panel.add(bottom, BorderLayout.SOUTH);
-        return panel;
-    }
 
-    private JPanel createCaesarToolTab() {
-        JPanel panel = new JPanel(new GridLayout(5, 1));
-        JTextArea input = new JTextArea("Enter text to encrypt/decrypt.");
-        JTextField keyField = new JTextField("Key (e.g., 3)");
-        JComboBox<String> mode = new JComboBox<>(new String[]{"Encrypt", "Decrypt"});
-        JButton execute = new JButton("Apply Caesar");
-        JTextArea output = new JTextArea("Result here...");
 
-        panel.add(new JLabel("Caesar Cipher Tool"));
-        panel.add(new JScrollPane(input));
-        panel.add(keyField);
-        panel.add(mode);
-        panel.add(execute);
-        panel.add(new JScrollPane(output));
-        return panel;
-    }
-
-    private JPanel createCrackerTab() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JTextArea cipherTextArea = new JTextArea("Paste encrypted Caesar text here.");
-        JButton crackButton = new JButton("Crack Caesar Cipher");
-        JTextArea crackedOutput = new JTextArea("Cracked text will appear here.");
-        panel.add(new JLabel("Cracker"), BorderLayout.NORTH);
-        panel.add(new JScrollPane(cipherTextArea), BorderLayout.CENTER);
-        JPanel bottom = new JPanel(new BorderLayout());
-        bottom.add(crackButton, BorderLayout.NORTH);
-        bottom.add(new JScrollPane(crackedOutput), BorderLayout.CENTER);
-        panel.add(bottom, BorderLayout.SOUTH);
-        return panel;
-    }
-
-    private JPanel createTutorialTab() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JTextArea tutorialText = new JTextArea("Welcome to the Language Detector & Caesar Cipher Tool.\nUse the tabs to train, detect, encrypt, and crack.");
-        tutorialText.setEditable(false);
-        panel.add(new JLabel("Tutorial"), BorderLayout.NORTH);
-        panel.add(new JScrollPane(tutorialText), BorderLayout.CENTER);
-        return panel;
-    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(GUI::new);
