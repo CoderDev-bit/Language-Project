@@ -6,14 +6,13 @@ import java.awt.*;
 public class CrackerTab extends BaseTab {
 
     public CrackerTab() {
-
+        initTab();
     }
 
     public void initTab() {
 
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(BACKGROUND);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel label = new JLabel("Paste Caesar-encrypted text below:");
         label.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -35,13 +34,13 @@ public class CrackerTab extends BaseTab {
         crackedOutput.setEditable(false);
         crackedOutput.setBackground(ACCENT);
 
-        panel.add(label, BorderLayout.NORTH);
-        panel.add(new JScrollPane(cipherTextArea), BorderLayout.CENTER);
+        add(label, BorderLayout.NORTH);
+        add(new JScrollPane(cipherTextArea), BorderLayout.CENTER);
         JPanel bottom = new JPanel(new BorderLayout());
         bottom.setBackground(BACKGROUND);
         bottom.add(crackButton, BorderLayout.NORTH);
         bottom.add(new JScrollPane(crackedOutput), BorderLayout.CENTER);
-        panel.add(bottom, BorderLayout.SOUTH);
+        add(bottom, BorderLayout.SOUTH);
 
 
 

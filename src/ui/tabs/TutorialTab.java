@@ -5,14 +5,15 @@ import java.awt.*;
 
 public class TutorialTab extends BaseTab{
 
-    public TutorialTab() {
+    private static final String strVideoLink = "https://www.youtube.com/watch?v=8yh9BPUBbbQ";
 
+    public TutorialTab() {
+        initTab();
     }
 
     public void initTab() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(BACKGROUND);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel label = new JLabel("How to Use This Tool");
         label.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -35,8 +36,8 @@ public class TutorialTab extends BaseTab{
         tutorialText.setWrapStyleWord(true);
         tutorialText.setBackground(ACCENT);
 
-        panel.add(label, BorderLayout.NORTH);
-        panel.add(new JScrollPane(tutorialText), BorderLayout.CENTER);
+        add(label, BorderLayout.NORTH);
+        add(new JScrollPane(tutorialText), BorderLayout.CENTER);
 
     }
 

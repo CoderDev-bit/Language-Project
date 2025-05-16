@@ -8,14 +8,12 @@ import java.awt.*;
 public class DetectorTab extends BaseTab {
 
     public DetectorTab() {
-
-
+        initTab();
     }
 
     public void initTab() {
-        JPanel outerPanel = new JPanel();
-        outerPanel.setBackground(BACKGROUND);
-        outerPanel.setLayout(new BorderLayout());
+        //JPanel outerPanel = new JPanel();
+       setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -123,7 +121,7 @@ public class DetectorTab extends BaseTab {
 
         panel.add(resultLabel);
 
-        outerPanel.add(panel, BorderLayout.NORTH);
+        add(panel, BorderLayout.NORTH);
 
     }
 }

@@ -5,15 +5,10 @@ import java.awt.*;
 
 public class CaesarToolTab extends BaseTab {
     public CaesarToolTab() {
-
+        initTab();
     }
 
     public void initTab() {
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(BACKGROUND);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
         JLabel label = new JLabel("Caesar Cipher Tool");
         label.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -46,30 +41,30 @@ public class CaesarToolTab extends BaseTab {
         output.setBackground(ACCENT);
         JScrollPane outputScroll = new JScrollPane(output);
 
-        panel.add(label);
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        add(label);
+        add(Box.createRigidArea(new Dimension(0, 10)));
         JLabel inputLabel = new JLabel("Enter Text:");
         inputLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         inputLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(inputLabel);
+        add(inputLabel);
         inputScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(inputScroll);
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        add(inputScroll);
+        add(Box.createRigidArea(new Dimension(0, 10)));
         JLabel keyLabel = new JLabel("Key:");
         keyLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         keyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(keyLabel);
+        add(keyLabel);
         keyField.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(keyField);
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        add(keyField);
+        add(Box.createRigidArea(new Dimension(0, 10)));
         mode.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(mode);
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        add(mode);
+        add(Box.createRigidArea(new Dimension(0, 10)));
         execute.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(execute);
-        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        add(execute);
+        add(Box.createRigidArea(new Dimension(0, 10)));
         outputScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(outputScroll);
+        add(outputScroll);
 
 
     }

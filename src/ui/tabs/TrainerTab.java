@@ -9,11 +9,9 @@ public class TrainerTab extends BaseTab{
     }
 
     public void initTab() {
-        setBackground(BACKGROUND);
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // Main label
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
         JLabel label = new JLabel("Train a language profile:");
         label.setFont(new Font("SansSerif", Font.BOLD, 16));
         label.setForeground(PRIMARY);

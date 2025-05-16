@@ -12,8 +12,6 @@ import static ui.tabs.BaseTab.BACKGROUND;
 
 public class GUI {
 
-    private static final String strVideoLink = "https://www.youtube.com/watch?v=8yh9BPUBbbQ";
-
     private JFrame frmMain;
 
     public GUI() {
