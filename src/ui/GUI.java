@@ -13,34 +13,43 @@ import static ui.tabs.BaseTab.BACKGROUND;
 public class GUI {
 
     private JFrame frmMain;
+    private JTabbedPane tabs;
 
     public GUI() {
+
+        initGUI();
+        initTabs();
+
+        frmMain.add(tabs, BorderLayout.CENTER);
+        frmMain.setVisible(true);
+
+    }
+
+    private void initGUI() {
 
         frmMain = new JFrame("Language Detector & Caesar Cipher Tool");
         frmMain.setBounds(5,5,600,500);
         frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frmMain.setResizable(false);
 
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 14));
-        tabbedPane.setBackground(BACKGROUND);
-
-        tabbedPane.add("Trainer", new TrainerTab());
-        tabbedPane.add("Detector", new DetectorTab());
-        tabbedPane.add("Caesar Tool", new CaesarToolTab());
-        tabbedPane.add("Cracker", new CrackerTab());
-        tabbedPane.add("Tutorial", new TutorialTab());
-
-        frmMain.add(tabbedPane);
-        frmMain.setVisible(true);
-
     }
 
+    private void initTabs() {
 
+        tabs = new JTabbedPane(JTabbedPane.TOP);
+        tabs.setFont(new Font("SansSerif", Font.BOLD, 14));
+        tabs.setBackground(BACKGROUND);
 
+        tabs.add("Trainer", new TrainerTab());
+        tabs.add("Detector", new DetectorTab());
+        tabs.add("Caesar Tool", new CaesarToolTab());
+        tabs.add("Cracker", new CrackerTab());
+        tabs.add("Tutorial", new TutorialTab());
 
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(GUI::new);
     }
+
 }
