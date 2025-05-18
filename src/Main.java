@@ -7,40 +7,7 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) {
-        /*try {
-            // 1) Supabase project URL (no path/query)
-            DatabaseManager1 db = getDatabaseManager();
 
-            int code = db.createTable("mYTABle1");
-            System.out.println("CREATE TABLE HTTP code: " + code);
-
-            // 3) Build JSON using your exact column names
-            String payload = """
-                    {
-                      "user_id": "THIS",
-                      "message": "Not really)))"
-                    }
-                    """;
-
-
-            // 4) INSERT into Test
-            int insertCode = db.insertRow("mYTABle1", payload);
-            System.out.println("INSERT HTTP code: " + insertCode);
-
-            // 5) READ all rows back
-            String allRows = db.readRows("mYTABle1", "?select=*");
-            System.out.println("ROWS JSON: " + allRows);
-
-            // 6) Optional: print your internal log
-            System.out.println("--- LOG ---\n" + db.getLog());
-
-            String test = db.listTables();
-            System.out.println(test);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-        //new GUI();
     }
 
     private static DatabaseManager1 getDatabaseManager() throws IOException {
