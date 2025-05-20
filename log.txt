@@ -1,0 +1,663 @@
+[2025-05-18T20:53:28.111973400] File logging enabled to path: log.txt
+[2025-05-18T20:53:29.888748300] INSERT into 'characters' → HTTP 201
+[2025-05-18T20:53:30.075256700] READ from 'words' failed → HTTP 404
+[2025-05-18T20:53:46.393272500] File logging enabled to path: log.txt
+[2025-05-18T20:53:47.513205600] INSERT into 'words' → HTTP 400
+[2025-05-18T20:53:47.655200900] READ from 'words' failed → HTTP 404
+[2025-05-18T20:55:52.589815300] File logging enabled to path: log.txt
+[2025-05-18T20:55:53.720313800] INSERT into 'words' → HTTP 400
+[2025-05-18T20:55:53.846312200] READ from 'words' failed → HTTP 400
+[2025-05-18T21:17:40.229432] File logging enabled to path: log.txt
+[2025-05-18T21:17:41.689431300] INSERT into 'words' → HTTP 409
+[2025-05-18T21:17:41.828429200] READ from 'words' failed → HTTP 404
+[2025-05-18T21:20:15.520689700] File logging enabled to path: log.txt
+[2025-05-18T21:25:52.713619300] File logging enabled to path: log.txt
+[2025-05-18T21:28:27.854648300] File logging enabled to path: log.txt
+[2025-05-18T21:33:19.210396700] File logging enabled to path: log.txt
+[2025-05-18T21:33:20.273089] INSERT into 'words' → HTTP 201
+[2025-05-18T21:33:20.417614400] READ from 'words' failed → HTTP 404
+[2025-05-18T21:36:01.990877800] File logging enabled to path: log.txt
+[2025-05-18T21:36:03.182880600] INSERT into 'words' → HTTP 201
+[2025-05-18T21:36:03.332878600] READ from 'words' failed → HTTP 404
+[2025-05-18T21:40:04.977702100] File logging enabled to path: log.txt
+[2025-05-18T21:40:06.201807] INSERT into 'words' → HTTP 201
+[2025-05-18T21:40:06.337806800] READ from 'words' failed → HTTP 400
+[2025-05-18T21:41:40.984029800] File logging enabled to path: log.txt
+[2025-05-18T21:41:41.953622] INSERT into 'words' → HTTP 201
+[2025-05-18T21:41:42.117784100] READ from 'words' succeeded
+[2025-05-18T21:41:42.186781200] LIST TABLES succeeded.
+[2025-05-18T21:44:59.396866300] File logging enabled to path: log.txt
+[2025-05-18T21:45:00.430596200] EXECUTE SQL to create table 'demo_table' → HTTP 204
+[2025-05-18T21:45:00.548595800] INSERT into 'words' → HTTP 201
+[2025-05-18T21:45:00.719596800] READ from 'words' succeeded
+[2025-05-18T21:45:00.810596700] LIST TABLES succeeded.
+[2025-05-18T22:05:39.878079300] File logging enabled to path: log.txt
+[2025-05-18T22:05:41.003100200] INSERT into 'words' → HTTP 201
+[2025-05-18T22:05:41.175183800] READ from 'words' succeeded
+[2025-05-18T22:05:41.227215200] READ from 'words' failed → HTTP 500
+[2025-05-18T22:06:20.977834100] File logging enabled to path: log.txt
+[2025-05-18T22:06:22.935856600] INSERT into 'words' → HTTP 201
+[2025-05-18T22:06:23.131858200] READ from 'words' succeeded
+[2025-05-18T22:07:07.283921900] File logging enabled to path: log.txt
+[2025-05-18T22:07:08.806438900] INSERT into 'words' → HTTP 201
+[2025-05-18T22:07:08.960301500] READ from 'words' succeeded
+[2025-05-18T22:07:55.376193300] File logging enabled to path: log.txt
+[2025-05-18T22:07:56.358030200] READ from 'words' succeeded
+[2025-05-18T22:07:56.411027400] READ from 'words' failed → HTTP 500
+[2025-05-18T22:15:07.429958] File logging enabled to path: log.txt
+[2025-05-18T22:15:08.533300100] READ from 'words' succeeded
+[2025-05-18T22:15:08.590291100] READ from 'words' succeeded
+[2025-05-18T22:15:08.591290300] Target column not found in the result.
+[2025-05-18T22:16:55.325512900] File logging enabled to path: log.txt
+[2025-05-18T22:16:56.409920700] READ from 'words' succeeded
+[2025-05-18T22:16:56.493917800] READ from 'words' succeeded
+[2025-05-18T22:16:56.494936] Target column not found in the result.
+[2025-05-18T22:19:10.553742100] File logging enabled to path: log.txt
+[2025-05-18T22:19:11.899288] READ from 'words' succeeded
+[2025-05-18T22:19:11.974287] READ from 'words' succeeded
+[2025-05-18T22:19:11.975287500] Target column not found in the result.
+[2025-05-18T22:24:58.242200900] File logging enabled to path: log.txt
+[2025-05-18T22:25:01.842788800] READ from 'words' succeeded
+[2025-05-18T22:25:01.911789800] READ from 'words' succeeded
+[2025-05-18T22:25:01.912789300] Target column not found in the result.
+[2025-05-18T22:26:12.881971100] File logging enabled to path: log.txt
+[2025-05-18T22:26:14.972713300] READ from 'words' succeeded
+[2025-05-18T22:26:15.077712400] READ from 'words' succeeded
+[2025-05-18T22:26:15.078713200] Target column not found in the result.
+[2025-05-18T22:26:47.839103100] File logging enabled to path: log.txt
+[2025-05-18T22:26:49.687081100] READ from 'words' succeeded
+[2025-05-18T22:26:49.769082600] READ from 'words' succeeded
+[2025-05-18T22:26:49.770091100] Target column not found in the result.
+[2025-05-18T22:33:36.900819400] File logging enabled to path: log.txt
+[2025-05-18T22:33:38.984116700] READ from 'words' succeeded
+[2025-05-18T22:33:39.023121100] READ from 'words' failed → HTTP 400
+[2025-05-18T22:34:51.129545800] File logging enabled to path: log.txt
+[2025-05-18T22:34:53.508142] READ from 'words' succeeded
+[2025-05-18T22:34:53.601144500] READ from 'words' failed → HTTP 400
+[2025-05-18T22:36:40.365840400] File logging enabled to path: log.txt
+[2025-05-18T22:36:42.067061600] READ from 'words' succeeded
+[2025-05-18T22:36:42.141061900] READ from 'words' succeeded
+[2025-05-18T22:43:57.654210] File logging enabled to path: log.txt
+[2025-05-18T22:44:00.375070900] READ from 'words' succeeded
+[2025-05-18T22:44:00.500068100] READ from 'words' succeeded
+[2025-05-18T23:22:39.398121100] File logging enabled to path: log.txt
+[2025-05-18T23:22:41.277653] READ from 'words' succeeded
+[2025-05-18T23:22:41.343656400] READ from 'words' succeeded
+[2025-05-18T23:27:40.214664600] File logging enabled to path: log.txt
+[2025-05-18T23:27:41.883147400] READ from 'words' succeeded
+[2025-05-18T23:27:41.978148800] READ from 'characters' failed → HTTP 400
+[2025-05-18T23:29:33.971858700] File logging enabled to path: log.txt
+[2025-05-18T23:29:34.878580400] READ from 'words' succeeded
+[2025-05-18T23:29:34.986579600] READ from 'characters' succeeded
+[2025-05-18T23:40:31.255185100] File logging enabled to path: log.txt
+[2025-05-18T23:40:32.304186700] READ from 'words' succeeded
+[2025-05-18T23:40:32.409812800] READ from 'characters' succeeded
+[2025-05-18T23:54:29.666531900] File logging enabled to path: log.txt
+[2025-05-18T23:54:30.911530200] READ from 'words' succeeded
+[2025-05-18T23:54:30.979531200] READ from 'characters' failed → HTTP 400
+[2025-05-18T23:54:40.999063300] File logging enabled to path: log.txt
+[2025-05-18T23:54:42.252385100] READ from 'words' succeeded
+[2025-05-18T23:54:42.310384900] READ from 'characters' failed → HTTP 400
+[2025-05-18T23:56:14.346913900] File logging enabled to path: log.txt
+[2025-05-18T23:56:15.366022700] READ from 'words' succeeded
+[2025-05-18T23:56:15.465018] READ from 'characters' failed → HTTP 400
+[2025-05-19T00:11:41.369981400] File logging enabled to path: log.txt
+[2025-05-19T00:11:42.850886600] READ from 'words' succeeded
+[2025-05-19T00:11:42.957885700] READ from 'characters' failed → HTTP 400
+[2025-05-19T00:12:38.973730800] File logging enabled to path: log.txt
+[2025-05-19T00:12:40.108053800] READ from 'words' succeeded
+[2025-05-19T00:12:40.210056] READ from 'characters' succeeded
+[2025-05-19T00:32:40.678984600] File logging enabled to path: log.txt
+[2025-05-19T00:32:41.942160800] READ from 'words' succeeded
+[2025-05-19T00:32:42.027162700] READ from 'characters' succeeded
+[2025-05-19T00:34:48.033737] File logging enabled to path: log.txt
+[2025-05-19T00:34:49.367121300] READ from 'words' succeeded
+[2025-05-19T00:34:49.425120400] READ from 'characters' succeeded
+[2025-05-19T00:40:08.040905400] File logging enabled to path: log.txt
+[2025-05-19T00:40:09.422415800] READ from 'words' succeeded
+[2025-05-19T00:40:09.505791100] READ from 'characters' succeeded
+[2025-05-19T00:41:49.421493200] File logging enabled to path: log.txt
+[2025-05-19T00:41:50.500354300] READ from 'words' succeeded
+[2025-05-19T00:41:50.552353600] READ from 'characters' succeeded
+[2025-05-19T00:44:11.362956600] File logging enabled to path: log.txt
+[2025-05-19T00:44:12.769295500] READ from 'words' succeeded
+[2025-05-19T00:44:12.861295700] READ from 'characters' succeeded
+[2025-05-19T00:49:19.917726] File logging enabled to path: log.txt
+[2025-05-19T00:49:21.417980200] READ from 'words' succeeded
+[2025-05-19T00:49:21.467977800] READ from 'characters' succeeded
+[2025-05-19T00:49:21.539978100] INSERT into 'words' → HTTP 201
+[2025-05-19T00:54:17.669199200] File logging enabled to path: log.txt
+[2025-05-19T00:54:19.015061700] READ from 'words' succeeded
+[2025-05-19T00:54:19.074119100] READ from 'characters' succeeded
+[2025-05-19T00:54:19.142694400] INSERT into 'characters' → HTTP 201
+[2025-05-19T01:07:42.856524900] File logging enabled to path: log.txt
+[2025-05-19T01:07:43.835228700] READ from 'words' succeeded
+[2025-05-19T01:07:43.888233800] READ from 'characters' succeeded
+[2025-05-19T01:07:43.976228600] READ from 'words' succeeded
+[2025-05-19T01:07:44.081228700] READ from 'characters' succeeded
+[2025-05-19T01:09:17.000483700] File logging enabled to path: log.txt
+[2025-05-19T01:09:18.403985200] READ from 'words' succeeded
+[2025-05-19T01:09:18.488985100] READ from 'characters' succeeded
+[2025-05-19T01:09:18.567497400] READ from 'words' succeeded
+[2025-05-19T01:09:18.622498200] READ from 'words' succeeded
+[2025-05-19T01:09:18.674496600] READ from 'characters' succeeded
+[2025-05-19T01:09:18.753498500] READ from 'characters' succeeded
+[2025-05-19T01:11:20.831723] File logging enabled to path: log.txt
+[2025-05-19T01:11:22.022721700] READ from 'words' succeeded
+[2025-05-19T01:11:22.071723200] READ from 'characters' succeeded
+[2025-05-19T01:11:22.151723400] READ from 'words' succeeded
+[2025-05-19T01:11:22.212725200] READ from 'words' succeeded
+[2025-05-19T01:11:22.267722900] READ from 'characters' succeeded
+[2025-05-19T01:11:22.322723500] READ from 'characters' succeeded
+[2025-05-19T01:12:18.352824800] File logging enabled to path: log.txt
+[2025-05-19T01:12:19.757385700] READ from 'words' succeeded
+[2025-05-19T01:12:19.842385300] READ from 'characters' succeeded
+[2025-05-19T01:12:20.057393300] READ from 'words' succeeded
+[2025-05-19T01:12:20.115385900] READ from 'words' succeeded
+[2025-05-19T01:12:20.177386400] READ from 'characters' succeeded
+[2025-05-19T01:12:20.260969100] READ from 'characters' succeeded
+[2025-05-19T01:12:30.812135300] File logging enabled to path: log.txt
+[2025-05-19T01:12:31.738548300] READ from 'words' succeeded
+[2025-05-19T01:12:31.801554200] READ from 'characters' succeeded
+[2025-05-19T01:12:31.857548700] READ from 'words' succeeded
+[2025-05-19T01:12:31.915552200] READ from 'words' succeeded
+[2025-05-19T01:12:31.968548100] READ from 'characters' succeeded
+[2025-05-19T01:12:32.025547100] READ from 'characters' succeeded
+[2025-05-19T01:12:41.767600800] File logging enabled to path: log.txt
+[2025-05-19T01:12:42.921522] READ from 'words' succeeded
+[2025-05-19T01:12:42.991522200] READ from 'characters' succeeded
+[2025-05-19T01:12:43.045522500] READ from 'words' succeeded
+[2025-05-19T01:12:43.094522600] READ from 'words' succeeded
+[2025-05-19T01:12:43.153527300] READ from 'characters' succeeded
+[2025-05-19T01:12:43.203522600] READ from 'characters' succeeded
+[2025-05-19T01:34:10.185221] File logging enabled to path: log.txt
+[2025-05-19T01:34:11.511122800] READ from 'words' succeeded
+[2025-05-19T01:34:11.571123300] READ from 'characters' succeeded
+[2025-05-19T01:34:11.650123300] READ from 'words' succeeded
+[2025-05-19T01:34:11.702121200] READ from 'words' succeeded
+[2025-05-19T01:34:11.773121100] READ from 'characters' succeeded
+[2025-05-19T01:34:11.828122500] READ from 'characters' succeeded
+[2025-05-19T01:34:11.907123300] READ from 'words' succeeded
+[2025-05-19T01:34:25.592412300] File logging enabled to path: log.txt
+[2025-05-19T01:34:26.767235500] READ from 'words' succeeded
+[2025-05-19T01:34:26.843237900] READ from 'characters' succeeded
+[2025-05-19T01:34:26.915236800] READ from 'words' succeeded
+[2025-05-19T01:34:26.992238] READ from 'words' succeeded
+[2025-05-19T01:34:27.042236400] READ from 'characters' succeeded
+[2025-05-19T01:34:27.098237600] READ from 'characters' succeeded
+[2025-05-19T01:34:27.159238700] READ from 'words' succeeded
+[2025-05-19T01:36:20.328216] File logging enabled to path: log.txt
+[2025-05-19T01:36:21.765878] READ from 'words' succeeded
+[2025-05-19T01:36:21.841869800] READ from 'characters' succeeded
+[2025-05-19T01:36:21.890867400] READ from 'words' succeeded
+[2025-05-19T01:36:21.941868300] READ from 'words' succeeded
+[2025-05-19T01:36:21.990867400] READ from 'characters' succeeded
+[2025-05-19T01:36:22.066868] READ from 'characters' succeeded
+[2025-05-19T01:36:22.126952] READ from 'words' succeeded
+[2025-05-19T01:36:22.185955] UPDATE frequency of word 'Not' in 'english' → HTTP 400
+[2025-05-19T01:48:04.739334500] File logging enabled to path: log.txt
+[2025-05-19T01:48:07.645229200] READ from 'words' succeeded
+[2025-05-19T01:48:07.702227900] READ from 'characters' succeeded
+[2025-05-19T01:48:07.763227300] READ from 'words' succeeded
+[2025-05-19T01:48:07.814225900] READ from 'words' succeeded
+[2025-05-19T01:48:07.868227400] READ from 'characters' succeeded
+[2025-05-19T01:48:07.918227900] READ from 'characters' succeeded
+[2025-05-19T01:48:07.976227500] READ from 'words' succeeded
+[2025-05-19T01:48:08.041225600] UPDATE frequency of word 'Not' in 'english' → HTTP 400
+[2025-05-19T01:57:36.016968200] File logging enabled to path: log.txt
+[2025-05-19T01:57:38.932529900] READ from 'words' succeeded
+[2025-05-19T01:57:38.983530] READ from 'characters' succeeded
+[2025-05-19T01:57:39.060529200] READ from 'words' succeeded
+[2025-05-19T01:57:39.114530700] READ from 'words' succeeded
+[2025-05-19T01:57:39.162495800] READ from 'characters' succeeded
+[2025-05-19T01:57:39.216496] READ from 'characters' succeeded
+[2025-05-19T01:57:39.274497300] READ from 'words' succeeded
+[2025-05-19T02:00:35.299752400] File logging enabled to path: log.txt
+[2025-05-19T02:00:37.572964400] READ from 'words' succeeded
+[2025-05-19T02:00:37.657964600] READ from 'characters' succeeded
+[2025-05-19T02:00:37.708966900] READ from 'words' succeeded
+[2025-05-19T02:00:37.765965100] READ from 'words' succeeded
+[2025-05-19T02:00:37.818018200] READ from 'characters' succeeded
+[2025-05-19T02:00:37.867016900] READ from 'characters' succeeded
+[2025-05-19T02:00:37.918018800] READ from 'words' succeeded
+[2025-05-19T02:00:38.030019100] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T02:02:08.457082100] File logging enabled to path: log.txt
+[2025-05-19T02:02:11.513215400] READ from 'words' succeeded
+[2025-05-19T02:02:11.594216100] READ from 'characters' succeeded
+[2025-05-19T02:02:11.673908500] READ from 'words' succeeded
+[2025-05-19T02:02:11.725427400] READ from 'words' succeeded
+[2025-05-19T02:02:11.780941400] READ from 'characters' succeeded
+[2025-05-19T02:02:11.867941] READ from 'characters' succeeded
+[2025-05-19T02:02:11.925943200] READ from 'words' succeeded
+[2025-05-19T02:02:12.007945800] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T02:05:52.624612500] File logging enabled to path: log.txt
+[2025-05-19T02:05:53.967428] READ from 'words' succeeded
+[2025-05-19T02:05:54.049427700] READ from 'characters' succeeded
+[2025-05-19T02:05:54.133434900] READ from 'words' succeeded
+[2025-05-19T02:05:54.180428300] READ from 'words' succeeded
+[2025-05-19T02:05:54.231426900] READ from 'characters' succeeded
+[2025-05-19T02:05:54.305585800] READ from 'characters' succeeded
+[2025-05-19T02:05:54.359587500] READ from 'words' succeeded
+[2025-05-19T02:05:54.450016900] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T02:07:24.373838500] File logging enabled to path: log.txt
+[2025-05-19T02:07:25.874914700] READ from 'words' succeeded
+[2025-05-19T02:07:25.938915500] READ from 'characters' succeeded
+[2025-05-19T02:07:26.011916500] READ from 'words' succeeded
+[2025-05-19T02:07:26.095917300] READ from 'words' succeeded
+[2025-05-19T02:07:26.156916700] READ from 'characters' succeeded
+[2025-05-19T02:07:26.213917] READ from 'characters' succeeded
+[2025-05-19T02:07:26.272916200] READ from 'words' succeeded
+[2025-05-19T02:07:26.347917500] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T02:17:14.461737500] File logging enabled to path: log.txt
+[2025-05-19T02:17:17.053211200] READ from 'words' succeeded
+[2025-05-19T02:17:17.158210200] READ from 'characters' succeeded
+[2025-05-19T02:17:17.213210600] READ from 'words' succeeded
+[2025-05-19T02:17:17.269209200] READ from 'words' succeeded
+[2025-05-19T02:17:17.320208800] READ from 'characters' succeeded
+[2025-05-19T02:17:17.372211400] READ from 'characters' succeeded
+[2025-05-19T02:17:17.421209400] READ from 'words' succeeded
+[2025-05-19T02:17:17.520211300] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T11:59:22.558536700] File logging enabled to path: log.txt
+[2025-05-19T11:59:23.885538300] READ from 'words' succeeded
+[2025-05-19T11:59:24.001685800] READ from 'characters' succeeded
+[2025-05-19T11:59:24.062684700] READ from 'words' succeeded
+[2025-05-19T11:59:24.185686300] READ from 'words' succeeded
+[2025-05-19T11:59:24.246600100] READ from 'characters' succeeded
+[2025-05-19T11:59:24.329755700] READ from 'characters' succeeded
+[2025-05-19T11:59:24.388756500] READ from 'words' succeeded
+[2025-05-19T11:59:24.475064900] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T12:00:19.827986600] File logging enabled to path: log.txt
+[2025-05-19T12:00:20.528775300] READ from 'words' succeeded
+[2025-05-19T12:00:20.591333500] READ from 'characters' succeeded
+[2025-05-19T12:00:20.657439200] READ from 'words' succeeded
+[2025-05-19T12:00:20.723440400] READ from 'words' succeeded
+[2025-05-19T12:00:20.794440500] READ from 'characters' succeeded
+[2025-05-19T12:00:20.858439] READ from 'characters' succeeded
+[2025-05-19T12:00:20.932442400] READ from 'words' succeeded
+[2025-05-19T12:00:21.072053500] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T12:00:33.986335900] File logging enabled to path: log.txt
+[2025-05-19T12:00:34.672338300] READ from 'words' succeeded
+[2025-05-19T12:00:34.772335800] READ from 'characters' succeeded
+[2025-05-19T12:00:34.844827900] READ from 'words' succeeded
+[2025-05-19T12:00:34.906991200] READ from 'words' succeeded
+[2025-05-19T12:00:35.041617100] READ from 'characters' succeeded
+[2025-05-19T12:00:35.096320500] READ from 'characters' succeeded
+[2025-05-19T12:00:35.155579400] READ from 'words' succeeded
+[2025-05-19T12:00:35.261657200] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T13:29:45.861671300] File logging enabled to path: log.txt
+[2025-05-19T13:29:47.067673800] READ from 'characters' succeeded
+[2025-05-19T13:29:47.189677900] INSERT into 'words' → HTTP 409
+[2025-05-19T13:29:47.323977200] READ from 'words' succeeded
+[2025-05-19T13:29:47.405957200] READ from 'words' succeeded
+[2025-05-19T13:29:47.466775200] READ from 'characters' succeeded
+[2025-05-19T13:29:47.555309800] READ from 'characters' succeeded
+[2025-05-19T13:29:47.605039300] READ from 'words' succeeded
+[2025-05-19T13:29:47.666078900] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T13:30:14.989417100] File logging enabled to path: log.txt
+[2025-05-19T13:30:15.920181300] READ from 'characters' succeeded
+[2025-05-19T13:30:15.994180800] INSERT into 'words' → HTTP 201
+[2025-05-19T13:30:16.120183200] READ from 'words' succeeded
+[2025-05-19T13:30:16.207994500] READ from 'words' succeeded
+[2025-05-19T13:30:16.267551400] READ from 'characters' succeeded
+[2025-05-19T13:30:16.324253200] READ from 'characters' succeeded
+[2025-05-19T13:30:16.384253200] READ from 'words' succeeded
+[2025-05-19T13:30:16.443341900] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T14:30:02.282564500] File logging enabled to path: log.txt
+[2025-05-19T14:30:03.501763200] READ from 'characters' succeeded
+[2025-05-19T14:30:03.559757200] READ from 'words' succeeded
+[2025-05-19T14:30:03.664764100] INSERT into 'words' → HTTP 409
+[2025-05-19T14:30:03.825758400] READ from 'words' succeeded
+[2025-05-19T14:30:03.878745500] READ from 'words' succeeded
+[2025-05-19T14:30:03.938632100] READ from 'characters' succeeded
+[2025-05-19T14:30:03.997156700] READ from 'characters' succeeded
+[2025-05-19T14:30:04.061198400] READ from 'words' succeeded
+[2025-05-19T14:30:04.117831] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T14:30:43.291659200] File logging enabled to path: log.txt
+[2025-05-19T14:30:44.190659500] READ from 'characters' succeeded
+[2025-05-19T14:30:44.270942600] READ from 'words' succeeded
+[2025-05-19T14:30:44.338941300] INSERT into 'words' → HTTP 409
+[2025-05-19T14:30:44.864623400] READ from 'words' succeeded
+[2025-05-19T14:30:44.946238900] READ from 'words' succeeded
+[2025-05-19T14:30:45.006842300] READ from 'characters' succeeded
+[2025-05-19T14:30:45.089982300] READ from 'characters' succeeded
+[2025-05-19T14:30:45.143486700] READ from 'words' succeeded
+[2025-05-19T14:30:45.221348700] Incremented abs_freq of word 'Not' in 'english' → HTTP 201
+[2025-05-19T14:43:28.498847] File logging enabled to path: log.txt
+[2025-05-19T14:43:29.921024900] READ from 'characters' succeeded
+[2025-05-19T14:43:29.973022900] READ from 'words' succeeded
+[2025-05-19T14:43:30.037025900] INSERT into 'words' → HTTP 409
+[2025-05-19T14:43:30.160024300] READ from 'words' succeeded
+[2025-05-19T14:43:30.215027700] READ from 'words' succeeded
+[2025-05-19T14:43:30.273029100] READ from 'characters' succeeded
+[2025-05-19T14:43:30.356028400] READ from 'characters' succeeded
+[2025-05-19T14:43:30.437165400] READ from 'words' succeeded
+[2025-05-19T14:47:31.758629500] File logging enabled to path: log.txt
+[2025-05-19T14:47:33.632042400] READ from 'characters' succeeded
+[2025-05-19T14:47:33.717040] READ from 'words' succeeded
+[2025-05-19T14:47:33.786042900] INSERT into 'words' → HTTP 409
+[2025-05-19T14:47:33.906046500] READ from 'words' succeeded
+[2025-05-19T14:47:33.988045600] READ from 'words' succeeded
+[2025-05-19T14:47:34.072044800] READ from 'characters' succeeded
+[2025-05-19T14:47:34.130791300] READ from 'characters' succeeded
+[2025-05-19T14:47:34.193789900] READ from 'words' succeeded
+[2025-05-19T14:53:04.784424600] File logging enabled to path: log.txt
+[2025-05-19T14:53:06.063468400] READ from 'characters' succeeded
+[2025-05-19T14:53:06.112466700] READ from 'words' succeeded
+[2025-05-19T14:53:06.181467] INSERT into 'words' → HTTP 409
+[2025-05-19T14:53:06.322467900] READ from 'words' succeeded
+[2025-05-19T14:53:06.375466800] READ from 'words' succeeded
+[2025-05-19T14:53:06.426464600] READ from 'characters' succeeded
+[2025-05-19T14:53:06.479463600] READ from 'characters' succeeded
+[2025-05-19T14:53:06.532465100] READ from 'words' succeeded
+[2025-05-19T14:53:48.589444300] File logging enabled to path: log.txt
+[2025-05-19T14:53:49.616658300] READ from 'characters' succeeded
+[2025-05-19T14:53:49.670929600] READ from 'words' succeeded
+[2025-05-19T14:53:49.765924200] INSERT into 'words' → HTTP 409
+[2025-05-19T14:53:49.882924900] READ from 'words' succeeded
+[2025-05-19T14:53:49.998021600] READ from 'words' succeeded
+[2025-05-19T14:53:50.102024800] READ from 'characters' succeeded
+[2025-05-19T14:53:50.261016300] READ from 'characters' succeeded
+[2025-05-19T14:53:50.316017200] READ from 'words' succeeded
+[2025-05-19T15:13:32.713710500] File logging enabled to path: log.txt
+[2025-05-19T15:13:36.051448800] READ from 'characters' succeeded
+[2025-05-19T15:13:36.231005400] READ from 'words' succeeded
+[2025-05-19T15:13:36.600034700] INSERT into 'words' → HTTP 409
+[2025-05-19T15:13:37.001179] READ from 'words' succeeded
+[2025-05-19T15:13:37.665255200] READ from 'words' succeeded
+[2025-05-19T15:13:38.191635200] READ from 'characters' succeeded
+[2025-05-19T15:13:38.372662200] READ from 'characters' succeeded
+[2025-05-19T15:13:38.957926] READ from 'words' succeeded
+[2025-05-19T15:15:36.176064600] File logging enabled to path: log.txt
+[2025-05-19T15:15:37.309064400] READ from 'characters' succeeded
+[2025-05-19T15:15:37.387063200] READ from 'words' succeeded
+[2025-05-19T15:15:37.477499700] INSERT into 'words' → HTTP 409
+[2025-05-19T15:15:37.596319400] READ from 'words' succeeded
+[2025-05-19T15:15:37.667225] READ from 'words' succeeded
+[2025-05-19T15:15:37.775353700] READ from 'characters' succeeded
+[2025-05-19T15:15:37.895002500] READ from 'characters' succeeded
+[2025-05-19T15:15:37.953030400] READ from 'words' succeeded
+[2025-05-19T15:46:19.522172100] File logging enabled to path: log.txt
+[2025-05-19T15:46:20.665289600] READ from 'characters' succeeded
+[2025-05-19T15:46:20.741288800] READ from 'words' succeeded
+[2025-05-19T15:46:20.838289700] INSERT into 'words' → HTTP 409
+[2025-05-19T15:46:20.957295200] READ from 'words' succeeded
+[2025-05-19T15:46:21.017097500] READ from 'words' succeeded
+[2025-05-19T15:46:21.072106600] READ from 'characters' succeeded
+[2025-05-19T15:46:21.137204500] READ from 'characters' succeeded
+[2025-05-19T16:17:11.009915] File logging enabled to path: log.txt
+[2025-05-19T16:17:12.090917900] READ from 'characters' succeeded
+[2025-05-19T16:17:12.188916200] READ from 'words' succeeded
+[2025-05-19T16:17:12.261915300] INSERT into 'words' → HTTP 409
+[2025-05-19T16:17:12.401918] READ from 'words' succeeded
+[2025-05-19T16:17:12.460914] READ from 'words' succeeded
+[2025-05-19T16:17:12.548571300] READ from 'characters' succeeded
+[2025-05-19T16:17:12.603571200] READ from 'characters' succeeded
+[2025-05-19T16:19:47.220953400] File logging enabled to path: log.txt
+[2025-05-19T16:19:48.457088100] READ from 'characters' succeeded
+[2025-05-19T16:19:48.511091] READ from 'words' succeeded
+[2025-05-19T16:19:48.599090500] INSERT into 'words' → HTTP 409
+[2025-05-19T16:19:48.759091300] READ from 'words' succeeded
+[2025-05-19T16:19:48.820088900] READ from 'words' succeeded
+[2025-05-19T16:19:48.879091600] READ from 'characters' succeeded
+[2025-05-19T16:19:48.937090600] READ from 'characters' succeeded
+[2025-05-19T16:20:13.951618600] File logging enabled to path: log.txt
+[2025-05-19T16:20:14.860617800] READ from 'characters' succeeded
+[2025-05-19T16:20:14.936617600] READ from 'words' succeeded
+[2025-05-19T16:20:15.000618100] INSERT into 'words' → HTTP 409
+[2025-05-19T16:20:15.135232300] READ from 'words' succeeded
+[2025-05-19T16:20:15.192230200] READ from 'words' succeeded
+[2025-05-19T16:20:15.246235200] READ from 'characters' succeeded
+[2025-05-19T16:20:15.306220900] READ from 'characters' succeeded
+[2025-05-19T16:24:25.787815600] File logging enabled to path: log.txt
+[2025-05-19T16:24:26.872814700] READ from 'characters' succeeded
+[2025-05-19T16:24:26.917815600] READ from 'words' succeeded
+[2025-05-19T16:24:27.004819100] INSERT into 'words' → HTTP 409
+[2025-05-19T16:24:27.117819700] READ from 'words' succeeded
+[2025-05-19T16:24:27.176973100] READ from 'words' succeeded
+[2025-05-19T16:24:27.240314600] READ from 'characters' succeeded
+[2025-05-19T16:24:27.297319200] READ from 'characters' succeeded
+[2025-05-19T16:26:03.777071400] File logging enabled to path: log.txt
+[2025-05-19T16:26:04.873735900] READ from 'characters' succeeded
+[2025-05-19T16:26:04.933736] READ from 'words' succeeded
+[2025-05-19T16:26:05.005958900] INSERT into 'words' → HTTP 409
+[2025-05-19T16:26:05.128958900] READ from 'words' succeeded
+[2025-05-19T16:26:05.185957500] READ from 'words' succeeded
+[2025-05-19T16:26:05.241778300] READ from 'characters' succeeded
+[2025-05-19T16:26:05.302840700] READ from 'characters' succeeded
+[2025-05-19T16:31:43.758330800] File logging enabled to path: log.txt
+[2025-05-19T16:31:45.065856200] READ from 'characters' succeeded
+[2025-05-19T16:31:45.153985900] READ from 'words' succeeded
+[2025-05-19T16:31:45.223987100] INSERT into 'words' → HTTP 409
+[2025-05-19T16:31:45.343986600] READ from 'words' succeeded
+[2025-05-19T16:31:45.394986200] READ from 'words' succeeded
+[2025-05-19T16:31:45.441985700] READ from 'characters' succeeded
+[2025-05-19T16:31:45.497988300] READ from 'characters' succeeded
+[2025-05-19T16:39:52.944220500] File logging enabled to path: log.txt
+[2025-05-19T16:39:54.142360700] READ from 'characters' succeeded
+[2025-05-19T16:39:54.251376200] READ from 'words' succeeded
+[2025-05-19T16:39:54.353375700] INSERT into 'words' → HTTP 409
+[2025-05-19T16:39:54.465376200] READ from 'words' succeeded
+[2025-05-19T16:39:54.557505] READ from 'words' succeeded
+[2025-05-19T16:39:54.649524100] READ from 'characters' succeeded
+[2025-05-19T16:39:54.708435700] READ from 'characters' succeeded
+[2025-05-19T16:40:56.924292600] File logging enabled to path: log.txt
+[2025-05-19T16:40:57.836293700] READ from 'characters' succeeded
+[2025-05-19T16:40:57.905916400] READ from 'words' succeeded
+[2025-05-19T16:40:57.978914500] INSERT into 'words' → HTTP 409
+[2025-05-19T16:40:58.126989500] READ from 'words' succeeded
+[2025-05-19T16:40:58.218977800] READ from 'words' succeeded
+[2025-05-19T16:40:58.302512100] READ from 'characters' succeeded
+[2025-05-19T16:40:58.387568500] READ from 'characters' succeeded
+[2025-05-19T16:42:14.247531400] File logging enabled to path: log.txt
+[2025-05-19T16:42:15.347158600] READ from 'characters' succeeded
+[2025-05-19T16:42:15.402162400] READ from 'words' succeeded
+[2025-05-19T16:42:15.467156900] INSERT into 'words' → HTTP 409
+[2025-05-19T16:42:15.607978500] READ from 'words' succeeded
+[2025-05-19T16:42:15.664978100] READ from 'words' succeeded
+[2025-05-19T16:42:15.731068900] READ from 'characters' succeeded
+[2025-05-19T16:42:15.785046900] READ from 'characters' succeeded
+[2025-05-19T16:48:24.135078700] File logging enabled to path: log.txt
+[2025-05-19T16:48:25.541271800] READ from 'words' succeeded
+[2025-05-19T16:48:25.621273200] READ from 'words' succeeded
+[2025-05-19T16:48:25.675274700] READ from 'characters' succeeded
+[2025-05-19T16:48:25.753272500] READ from 'characters' succeeded
+[2025-05-19T17:02:34.772990900] File logging enabled to path: log.txt
+[2025-05-19T17:02:35.627621900] READ from 'words' succeeded
+[2025-05-19T17:02:35.681621] READ from 'words' succeeded
+[2025-05-19T17:02:35.737621500] READ from 'characters' succeeded
+[2025-05-19T17:02:35.796619200] READ from 'characters' succeeded
+[2025-05-19T17:03:27.655939600] File logging enabled to path: log.txt
+[2025-05-19T17:03:28.631114400] READ from 'words' succeeded
+[2025-05-19T17:03:28.712114500] READ from 'words' succeeded
+[2025-05-19T17:03:28.776131300] READ from 'characters' succeeded
+[2025-05-19T17:03:28.855119100] READ from 'characters' succeeded
+[2025-05-19T17:03:43.932102200] File logging enabled to path: log.txt
+[2025-05-19T17:03:44.775395200] READ from 'words' succeeded
+[2025-05-19T17:03:44.829395100] READ from 'words' succeeded
+[2025-05-19T17:03:44.913033700] READ from 'characters' succeeded
+[2025-05-19T17:03:44.966031700] READ from 'characters' succeeded
+[2025-05-19T17:07:59.497989600] File logging enabled to path: log.txt
+[2025-05-19T17:08:00.909630200] READ from 'words' succeeded
+[2025-05-19T17:08:00.960626600] READ from 'words' succeeded
+[2025-05-19T17:08:01.039206300] READ from 'characters' succeeded
+[2025-05-19T17:08:01.090205300] READ from 'characters' succeeded
+[2025-05-19T17:08:10.018220900] File logging enabled to path: log.txt
+[2025-05-19T17:08:11.033620700] READ from 'words' succeeded
+[2025-05-19T17:08:11.091621500] READ from 'words' succeeded
+[2025-05-19T17:08:11.175621100] READ from 'characters' succeeded
+[2025-05-19T17:08:11.250628700] READ from 'characters' succeeded
+[2025-05-19T17:16:23.751316400] File logging enabled to path: log.txt
+[2025-05-19T17:16:24.636314900] READ from 'words' succeeded
+[2025-05-19T17:16:24.697313900] READ from 'words' succeeded
+[2025-05-19T17:16:24.742317900] READ from 'characters' succeeded
+[2025-05-19T17:16:24.799316400] READ from 'characters' succeeded
+[2025-05-19T17:19:15.934729800] File logging enabled to path: log.txt
+[2025-05-19T17:19:16.792801800] READ from 'words' succeeded
+[2025-05-19T17:19:16.846801300] READ from 'words' succeeded
+[2025-05-19T17:19:16.902804300] READ from 'characters' succeeded
+[2025-05-19T17:19:16.955805900] READ from 'characters' succeeded
+[2025-05-19T17:26:43.758235800] File logging enabled to path: log.txt
+[2025-05-19T17:26:44.858237400] READ from 'words' succeeded
+[2025-05-19T17:26:44.922236] READ from 'words' succeeded
+[2025-05-19T17:26:44.971234900] READ from 'characters' succeeded
+[2025-05-19T17:26:45.026235600] READ from 'characters' succeeded
+[2025-05-19T17:29:28.242621] File logging enabled to path: log.txt
+[2025-05-19T17:29:29.244144600] READ from 'words' succeeded
+[2025-05-19T17:29:29.328144500] READ from 'words' succeeded
+[2025-05-19T17:29:29.402145700] READ from 'characters' succeeded
+[2025-05-19T17:29:29.485145300] READ from 'characters' succeeded
+[2025-05-19T17:29:29.540143500] READ from 'characters' succeeded
+[2025-05-19T17:29:58.470751800] File logging enabled to path: log.txt
+[2025-05-19T17:29:59.332752] READ from 'words' succeeded
+[2025-05-19T17:29:59.393754200] READ from 'words' succeeded
+[2025-05-19T17:29:59.454429300] READ from 'characters' succeeded
+[2025-05-19T17:29:59.511427700] READ from 'characters' succeeded
+[2025-05-19T17:29:59.567428200] READ from 'characters' succeeded
+[2025-05-19T17:34:58.801784800] File logging enabled to path: log.txt
+[2025-05-19T17:34:59.768305100] READ from 'words' succeeded
+[2025-05-19T17:34:59.841303200] READ from 'words' succeeded
+[2025-05-19T17:34:59.894304400] READ from 'characters' succeeded
+[2025-05-19T17:34:59.945305900] READ from 'characters' succeeded
+[2025-05-19T17:35:00.024089600] READ from 'characters' succeeded
+[2025-05-19T17:35:15.228577500] File logging enabled to path: log.txt
+[2025-05-19T17:35:16.393200300] READ from 'words' succeeded
+[2025-05-19T17:35:16.450206500] READ from 'words' succeeded
+[2025-05-19T17:35:16.503200400] READ from 'characters' succeeded
+[2025-05-19T17:35:16.570198400] READ from 'characters' succeeded
+[2025-05-19T17:35:16.632198700] READ from 'characters' succeeded
+[2025-05-19T17:36:13.287568200] File logging enabled to path: log.txt
+[2025-05-19T17:36:14.189221800] READ from 'words' succeeded
+[2025-05-19T17:36:14.241220200] READ from 'words' succeeded
+[2025-05-19T17:36:14.294223100] READ from 'characters' succeeded
+[2025-05-19T17:36:14.344223200] READ from 'characters' succeeded
+[2025-05-19T17:36:14.402221300] READ from 'characters' succeeded
+[2025-05-19T17:37:12.049340100] File logging enabled to path: log.txt
+[2025-05-19T17:37:13.227567900] READ from 'words' succeeded
+[2025-05-19T17:37:13.287567900] READ from 'words' succeeded
+[2025-05-19T17:37:13.363567600] READ from 'characters' succeeded
+[2025-05-19T17:37:13.421570800] READ from 'characters' succeeded
+[2025-05-19T17:37:13.469568100] READ from 'characters' succeeded
+[2025-05-19T17:40:13.261466200] File logging enabled to path: log.txt
+[2025-05-19T17:40:14.222466500] READ from 'words' succeeded
+[2025-05-19T17:40:14.272465200] READ from 'words' succeeded
+[2025-05-19T17:40:14.327468800] READ from 'characters' succeeded
+[2025-05-19T17:40:14.383466600] READ from 'characters' succeeded
+[2025-05-19T17:40:14.438464900] READ from 'characters' succeeded
+[2025-05-19T17:40:30.253353500] File logging enabled to path: log.txt
+[2025-05-19T17:40:31.097353800] READ from 'words' succeeded
+[2025-05-19T17:40:31.151352500] READ from 'words' succeeded
+[2025-05-19T17:40:31.229352200] READ from 'characters' succeeded
+[2025-05-19T17:40:31.279351400] READ from 'characters' succeeded
+[2025-05-19T17:40:31.357353200] READ from 'characters' succeeded
+[2025-05-19T17:42:28.893065200] File logging enabled to path: log.txt
+[2025-05-19T17:42:29.822289300] READ from 'words' succeeded
+[2025-05-19T17:42:29.893288600] READ from 'words' succeeded
+[2025-05-19T17:42:29.948300] READ from 'characters' succeeded
+[2025-05-19T17:42:29.995287500] READ from 'characters' succeeded
+[2025-05-19T17:42:36.677055] File logging enabled to path: log.txt
+[2025-05-19T17:42:37.556056600] READ from 'words' succeeded
+[2025-05-19T17:42:37.612055600] READ from 'words' succeeded
+[2025-05-19T17:42:37.670055100] READ from 'characters' succeeded
+[2025-05-19T17:42:37.724058400] READ from 'characters' succeeded
+[2025-05-19T17:42:57.354748600] File logging enabled to path: log.txt
+[2025-05-19T17:42:58.559715200] READ from 'words' succeeded
+[2025-05-19T17:42:58.615717400] READ from 'words' succeeded
+[2025-05-19T17:42:58.678715200] READ from 'characters' succeeded
+[2025-05-19T17:42:58.734716600] READ from 'characters' succeeded
+[2025-05-19T17:47:56.626540200] File logging enabled to path: log.txt
+[2025-05-19T17:47:57.693540600] READ from 'characters' succeeded
+[2025-05-19T17:47:57.756558500] READ from 'words' succeeded
+[2025-05-19T17:48:42.917458300] File logging enabled to path: log.txt
+[2025-05-19T17:48:44.127670900] READ from 'characters' succeeded
+[2025-05-19T17:48:44.216672600] READ from 'words' succeeded
+[2025-05-19T17:48:44.376672900] READ from 'characters' succeeded
+[2025-05-19T17:49:01.183370900] File logging enabled to path: log.txt
+[2025-05-19T17:49:02.203551600] READ from 'characters' succeeded
+[2025-05-19T17:49:02.258549300] READ from 'words' succeeded
+[2025-05-19T17:49:02.441549700] READ from 'characters' succeeded
+[2025-05-19T17:49:21.807766200] File logging enabled to path: log.txt
+[2025-05-19T17:49:22.643428700] READ from 'characters' succeeded
+[2025-05-19T17:49:22.697339800] READ from 'words' succeeded
+[2025-05-19T17:49:22.865337800] READ from 'characters' succeeded
+[2025-05-19T17:49:56.339798700] File logging enabled to path: log.txt
+[2025-05-19T17:49:57.362897800] READ from 'characters' succeeded
+[2025-05-19T17:49:57.415898] READ from 'words' succeeded
+[2025-05-19T17:49:57.599897400] READ from 'characters' succeeded
+[2025-05-19T17:50:02.764857] File logging enabled to path: log.txt
+[2025-05-19T17:50:03.639855500] READ from 'characters' succeeded
+[2025-05-19T17:50:03.688856300] READ from 'words' succeeded
+[2025-05-19T17:50:03.874855200] READ from 'characters' succeeded
+[2025-05-19T18:14:38.277831500] File logging enabled to path: log.txt
+[2025-05-19T18:14:39.295653500] READ from 'characters' succeeded
+[2025-05-19T18:14:39.372597300] READ from 'words' succeeded
+[2025-05-19T18:14:39.607947600] READ from 'characters' succeeded
+[2025-05-19T18:57:23.390006100] File logging enabled to path: log.txt
+[2025-05-19T18:57:24.403941700] READ from 'words' succeeded
+[2025-05-19T18:57:58.653595800] File logging enabled to path: log.txt
+[2025-05-19T18:58:01.551768900] READ from 'words' succeeded
+[2025-05-19T18:58:01.606766800] READ from 'characters' succeeded
+[2025-05-19T19:01:50.095724900] File logging enabled to path: log.txt
+[2025-05-19T19:01:51.057559] READ from 'words' succeeded
+[2025-05-19T19:01:51.116558200] READ from 'characters' succeeded
+[2025-05-19T19:03:11.947794500] File logging enabled to path: log.txt
+[2025-05-19T19:03:13.018804500] READ from 'words' succeeded
+[2025-05-19T19:03:13.078804700] READ from 'characters' succeeded
+[2025-05-19T19:06:33.743085300] File logging enabled to path: log.txt
+[2025-05-19T21:09:17.936276200] File logging enabled to path: log.txt
+[2025-05-19T21:10:00.036467400] File logging enabled to path: log.txt
+[2025-05-19T21:10:50.107094800] File logging enabled to path: log.txt
+[2025-05-19T21:11:34.619576] File logging enabled to path: log.txt
+[2025-05-19T21:16:09.702247] File logging enabled to path: log.txt
+[2025-05-19T21:16:39.164103400] File logging enabled to path: log.txt
+[2025-05-19T21:16:54.874813900] File logging enabled to path: log.txt
+[2025-05-19T21:17:06.595351600] File logging enabled to path: log.txt
+[2025-05-19T21:17:54.072823100] File logging enabled to path: log.txt
+[2025-05-19T22:43:02.529559400] File logging enabled to path: log.txt
+[2025-05-19T22:43:03.754563500] READ from 'words' failed → HTTP 401
+[2025-05-19T22:45:49.662569700] File logging enabled to path: log.txt
+[2025-05-19T22:45:51.115981300] READ from 'words' failed → HTTP 401
+[2025-05-19T22:50:03.633304200] File logging enabled to path: log.txt
+[2025-05-19T22:50:04.755422500] READ from 'words' succeeded
+[2025-05-19T22:50:04.841423100] READ from 'words' failed → HTTP 400
+[2025-05-19T22:51:25.896790100] File logging enabled to path: log.txt
+[2025-05-19T22:51:27.128295900] READ from 'words' succeeded
+[2025-05-19T22:51:27.222294700] READ from 'words' failed → HTTP 400
+[2025-05-19T23:17:50.119663] File logging enabled to path: log.txt
+[2025-05-19T23:17:51.260268400] READ from 'words' succeeded
+[2025-05-19T23:17:51.345272900] READ from '/rest/v1/rpc/get_languages' failed → HTTP 404
+[2025-05-19T23:19:39.691683800] File logging enabled to path: log.txt
+[2025-05-19T23:19:40.835832900] READ from 'words' succeeded
+[2025-05-19T23:19:40.930834100] READ from '/rest/v1/rpc/get_languages' failed → HTTP 404
+[2025-05-19T23:21:47.855268600] File logging enabled to path: log.txt
+[2025-05-19T23:21:49.038499900] READ from 'words' succeeded
+[2025-05-19T23:21:49.101968100] READ from '/rest/v1/rpc/get_languages' failed → HTTP 404
+[2025-05-19T23:23:33.718692800] File logging enabled to path: log.txt
+[2025-05-19T23:23:34.692217600] READ from 'words' succeeded
+[2025-05-19T23:25:49.401619600] File logging enabled to path: log.txt
+[2025-05-19T23:25:50.143362300] READ from 'words' succeeded
+[2025-05-19T23:27:39.132678300] File logging enabled to path: log.txt
+[2025-05-19T23:27:39.952440300] READ from 'words' succeeded
+[2025-05-19T23:28:27.584376400] File logging enabled to path: log.txt
+[2025-05-19T23:28:28.606570100] READ from 'words' succeeded
+[2025-05-19T23:32:44.643025500] File logging enabled to path: log.txt
+[2025-05-19T23:32:45.485022600] READ from 'words' succeeded
+[2025-05-19T23:33:28.467112300] File logging enabled to path: log.txt
+[2025-05-19T23:33:29.196112700] READ from 'words' succeeded
+[2025-05-19T23:34:53.761022900] File logging enabled to path: log.txt
+[2025-05-19T23:34:54.528157700] READ from 'words' succeeded
+[2025-05-19T23:36:12.977642700] File logging enabled to path: log.txt
+[2025-05-19T23:36:13.709644700] READ from 'words' succeeded
+[2025-05-19T23:37:00.845051800] File logging enabled to path: log.txt
+[2025-05-19T23:37:01.673052300] READ from 'words' succeeded
+[2025-05-19T23:38:04.358487900] File logging enabled to path: log.txt
+[2025-05-19T23:38:05.269303100] READ from 'words' succeeded
+[2025-05-19T23:56:55.640620800] File logging enabled to path: log.txt
+[2025-05-19T23:56:56.472722500] READ from 'words' succeeded
+[2025-05-19T23:59:04.547232200] File logging enabled to path: log.txt
+[2025-05-19T23:59:05.343235300] READ from 'words' succeeded
+[2025-05-20T00:01:31.126837300] File logging enabled to path: log.txt
+[2025-05-20T00:01:31.969422200] READ from 'words' succeeded
+[2025-05-20T00:08:55.143733600] File logging enabled to path: log.txt
+[2025-05-20T00:08:57.028055] READ from 'words' succeeded
+[2025-05-20T00:21:04.154261100] File logging enabled to path: log.txt
+[2025-05-20T00:21:04.971748100] READ from 'words' succeeded
