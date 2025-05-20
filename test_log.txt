@@ -1,0 +1,9 @@
+[2025-05-18T21:20:15.564690300] File logging enabled to path: test_log.txt
+[2025-05-18T21:20:17.050556] INSERT into 'messages' → HTTP 404
+[2025-05-18T21:20:17.197557200] READ from 'messages' failed → HTTP 404
+[2025-05-18T21:25:52.746617900] File logging enabled to path: test_log.txt
+[2025-05-18T21:25:54.038215900] INSERT into 'words' → HTTP 409
+[2025-05-18T21:25:54.268409300] READ from 'words' failed → HTTP 404
+[2025-05-18T21:28:27.893648400] File logging enabled to path: test_log.txt
+[2025-05-18T21:28:29.082221200] INSERT into 'words' → HTTP 409
+[2025-05-18T21:28:29.229277900] READ from 'words' failed → HTTP 404

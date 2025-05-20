@@ -12,12 +12,20 @@ public class TutorialTab extends BaseTab{
     }
 
     public void initTab() {
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout());
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(BACKGROUND);
+        content.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
         JLabel label = new JLabel("How to Use This Tool");
         label.setFont(new Font("SansSerif", Font.BOLD, 16));
         label.setForeground(PRIMARY);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        content.add(label);
+
+        content.add(Box.createRigidArea(new Dimension(0, 10)));
 
         String tutorialMessage =
                 "Welcome!\n" +
@@ -35,10 +43,14 @@ public class TutorialTab extends BaseTab{
         tutorialText.setLineWrap(true);
         tutorialText.setWrapStyleWord(true);
         tutorialText.setBackground(ACCENT);
+        JScrollPane tutorialScroll = new JScrollPane(tutorialText);
+        tutorialScroll.setPreferredSize(new Dimension(500, 200));
+        tutorialScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
+        content.add(tutorialScroll);
 
-        add(label, BorderLayout.NORTH);
-        add(new JScrollPane(tutorialText), BorderLayout.CENTER);
-
+        add(content, BorderLayout.CENTER);
+        this.revalidate();
+        this.repaint();
     }
 
 }

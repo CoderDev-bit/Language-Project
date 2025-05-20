@@ -6,8 +6,6 @@ import ui.tabs.*;
 
 import javax.swing.*;
 import java.awt.*;
-import static javax.swing.UIManager.getLookAndFeelDefaults;
-import static javax.swing.UIManager.getSystemLookAndFeelClassName;
 import static ui.tabs.BaseTab.BACKGROUND;
 
 public class GUI {
@@ -22,6 +20,8 @@ public class GUI {
 
         frmMain.add(tabs, BorderLayout.CENTER);
         frmMain.setVisible(true);
+        frmMain.revalidate();
+        frmMain.repaint();
 
     }
 
@@ -30,6 +30,7 @@ public class GUI {
         frmMain = new JFrame("Language Detector & Caesar Cipher Tool");
         frmMain.setBounds(5,5,600,500);
         frmMain.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frmMain.setLayout(new BorderLayout());
         frmMain.setResizable(false);
 
     }

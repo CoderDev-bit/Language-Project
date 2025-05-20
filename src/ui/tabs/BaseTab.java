@@ -13,7 +13,7 @@ public abstract class BaseTab extends JPanel {
 
     public BaseTab() {
         this.setBackground(BACKGROUND);
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        //this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
     }
 

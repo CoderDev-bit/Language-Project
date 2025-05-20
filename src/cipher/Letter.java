@@ -1,8 +1,8 @@
 package cipher;
 
 public class Letter implements Comparable<Letter>{
-    private int frequency;
-    private char letter;
+    private final int frequency;
+    private final char letter;
 
     public Letter(char letter, int frequency){
         this.letter = letter;
@@ -22,19 +22,14 @@ public class Letter implements Comparable<Letter>{
         return frequency;
     }
 
-    public void setFreq(int frequency){
-        this.frequency = frequency;
-    }
-
     @Override
     public String toString() {
-        return "Char: " + letter + " Frequency: " + frequency + "\n";
+        return "Char: " + letter + " Frequency: " + frequency;
     }
 
-    public int compareTo(Letter target){
-        if (target == null){ return -1; }
-        if (frequency > target.getFreq()){ return -1; }
-        if (frequency == target.getFreq()){ return 0; }
+    public int compareTo(Letter text){
+        if (text == null || frequency > text.getFreq()) { return -1; }
+        if (frequency == text.getFreq()) { return 0; }
         return 1;
     }
 }
