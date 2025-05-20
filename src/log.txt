@@ -1,0 +1,262 @@
+Using the attached class LanguageDatabaseManager in the text file, complete writing the class LanguageModel.java.
+
+1. Language Training & Database
+- build word frequency model
+- Use Java collections (HashMap, ArrayList, etc.) and sorting/filtering.
+- Store the trained data using a database
+
+2. Language Detection (analysis)
+- Allow users to input unknown text.
+- Match input to trained language profiles using scoring or similarity (list all languages' matching percentage.
+- Use efficient searching and sorting techniques to determine the most likely language
+
+Think step by step and analyze carefully:
+
+`package lang;
+
+import util.LanguageDatabaseManager;
+
+//import java.io.IO;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+
+public class LanguageModel {
+
+    LanguageDatabaseManager db;
+
+    public LanguageModel(LanguageDatabaseManager db) {
+
+
+
+    }
+
+    //GUI will remove the noise characters (emojis etc) and noise words (rarely used words). don't worry here
+    public void train(String strLanguageName, String strText, String[] wordSeperators) {
+
+
+
+    }
+
+    public HashMap<String,Double> analyze(String strText) {
+
+        return new HashMap<>();
+
+    }
+
+    public static void main(String[] args) {
+
+        LanguageDatabaseManager db = null;  // Local variable in main
+
+        try {
+            db = LanguageDatabaseManager.getDatabaseManager("https://frhgfmnvkopdwpiorszb.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyaGdmbW52a29wZHdwaW9yc3piIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQ5MzI0OCwiZXhwIjoyMDYyMDY5MjQ4fQ.bu7u6Doh9PMWGzpeROtFDm8qnSr5gk56m3vIDllMs7E");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create an instance of LanguageModel with db
+        LanguageModel test = new LanguageModel(db);
+    }
+
+}
+
+
+`
+
+
+-------
+
+package lang;
+
+import util.LanguageDatabaseManager;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+import java.util.regex.Pattern;
+
+public class LanguageModel {
+
+    LanguageDatabaseManager db;
+
+    public LanguageModel(LanguageDatabaseManager db) {
+        this.db = db;
+    }
+
+    // GUI will remove the noise characters (emojis etc) and noise words (rarely used words). don't worry here
+    public void train(String strLanguageName, String strText, String[] wordSeperators) throws IOException {
+        // Build word frequency model
+        Map<String, Integer> wordFrequencies = new HashMap<>();
+        Map<Character, Integer> charFrequencies = new HashMap<>();
+
+        // Create a regex pattern for splitting words
+        String regex = String.join("|", wordSeperators);
+        Pattern pattern = Pattern.compile(regex);
+        String[] words = pattern.split(strText.toLowerCase());
+
+        for (String word : words) {
+            if (!word.trim().isEmpty()) {
+                wordFrequencies.put(word, wordFrequencies.getOrDefault(word, 0) + 1);
+                for (char c : word.toCharArray()) {
+                    charFrequencies.put(c, charFrequencies.getOrDefault(c, 0) + 1);
+                }
+            }
+        }
+
+        // Store the trained data using the database manager
+        for (Map.Entry<String, Integer> entry : wordFrequencies.entrySet()) {
+            db.incrementWordAbsFreq(strLanguageName, entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<Character, Integer> entry : charFrequencies.entrySet()) {
+            db.incrementCharacterAbsFreq(strLanguageName, String.valueOf(entry.getKey()), entry.getValue());
+        }
+
+        // Update percentage frequencies after incrementing absolute frequencies
+        db.updateAllWordsPercentFreq(strLanguageName);
+        db.updateAllCharactersPercentFreq(strLanguageName);
+    }
+
+    public HashMap<String, Double> analyze(String strText) throws IOException {
+        // Calculate word and character frequencies for the input text
+        Map<String, Integer> inputTextWordFrequencies = new HashMap<>();
+        Map<Character, Integer> inputTextCharFrequencies = new HashMap<>();
+
+        // Assuming basic whitespace and punctuation as separators for analysis if not provided
+        String[] defaultWordSeparators = {"\\s+", "[.,!?;:\"()]"};
+        String regex = String.join("|", defaultWordSeparators);
+        Pattern pattern = Pattern.compile(regex);
+        String[] words = pattern.split(strText.toLowerCase());
+
+        for (String word : words) {
+            if (!word.trim().isEmpty()) {
+                inputTextWordFrequencies.put(word, inputTextWordFrequencies.getOrDefault(word, 0) + 1);
+                for (char c : word.toCharArray()) {
+                    inputTextCharFrequencies.put(c, inputTextCharFrequencies.getOrDefault(c, 0) + 1);
+                }
+            }
+        }
+
+        HashMap<String, Double> languageScores = new HashMap<>();
+        String[] storedLanguages = db.getStoredLanguages();
+
+        if (storedLanguages == null || storedLanguages.length == 0) {
+            System.out.println("No languages found in the database for analysis.");
+            return languageScores;
+        }
+
+        for (String lang : storedLanguages) {
+            double wordScore = 0.0;
+            double charScore = 0.0;
+            int commonWords = 0;
+            int commonChars = 0;
+
+            // Word-based scoring
+            for (Map.Entry<String, Integer> entry : inputTextWordFrequencies.entrySet()) {
+                String word = entry.getKey();
+                int inputFreq = entry.getValue();
+                try {
+                    String percentFreqStr = db.getWordProperty(lang, word, "percent_freq");
+                    if (percentFreqStr != null && !percentFreqStr.isEmpty()) {
+                        double dbPercentFreq = Double.parseDouble(percentFreqStr);
+                        // Simple scoring: sum of min(input_freq_normalized, db_freq_normalized)
+                        // Or a more sophisticated similarity like cosine similarity
+                        wordScore += Math.min((double) inputFreq / words.length, dbPercentFreq / 100.0);
+                        commonWords++;
+                    }
+                } catch (IOException e) {
+                    // Word not found in this language's profile, skip
+                }
+            }
+
+            // Character-based scoring
+            for (Map.Entry<Character, Integer> entry : inputTextCharFrequencies.entrySet()) {
+                String character = String.valueOf(entry.getKey());
+                int inputFreq = entry.getValue();
+                try {
+                    String percentFreqStr = db.getCharacterProperty(lang, character, "percent_freq");
+                    if (percentFreqStr != null && !percentFreqStr.isEmpty()) {
+                        double dbPercentFreq = Double.parseDouble(percentFreqStr);
+                        charScore += Math.min((double) inputFreq / strText.length(), dbPercentFreq / 100.0);
+                        commonChars++;
+                    }
+                } catch (IOException e) {
+                    // Character not found in this language's profile, skip
+                }
+            }
+
+            // Combine scores (can be weighted)
+            double totalScore = (wordScore * 0.7) + (charScore * 0.3); // Example weighting
+            languageScores.put(lang, totalScore * 100); // Convert to percentage
+        }
+
+        // Sort the languages by score in descending order
+        return languageScores.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1, LinkedHashMap::new));
+    }
+
+    public static void main(String[] args) {
+
+        LanguageDatabaseManager db = null;  // Local variable in main
+
+        try {
+            db = LanguageDatabaseManager.getDatabaseManager("https://frhgfmnvkopdwpiorszb.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyaGdmbW52a29wZHdwaW9yc3piIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjQ5MzI0OCwiZXhwIjoyMDYyMDY5MjQ4fQ.bu7u6Doh9PMWGzpeROtFDm8qnSr5gk56m3vIDllMs7E");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create an instance of LanguageModel with db
+        LanguageModel languageModel = new LanguageModel(db);
+
+        if (db != null) {
+            try {
+                // Example Training
+                System.out.println("--- Training English ---");
+                String englishText = "The quick brown fox jumps over the lazy dog. This is an English sentence.";
+                String[] englishSeparators = {"\\s+", "[.,!?;:\"()]"};
+                languageModel.train("English", englishText, englishSeparators);
+                System.out.println("English training complete.");
+
+                System.out.println("\n--- Training Spanish ---");
+                String spanishText = "El zorro rápido y marrón salta sobre el perro perezoso. Esta es una frase en español.";
+                String[] spanishSeparators = {"\\s+", "[.,!?;:\"()]"};
+                languageModel.train("Spanish", spanishText, spanishSeparators);
+                System.out.println("Spanish training complete.");
+
+                // Example Analysis
+                System.out.println("\n--- Analyzing Text ---");
+                String unknownText1 = "This text is in English.";
+                HashMap<String, Double> results1 = languageModel.analyze(unknownText1);
+                System.out.println("Analysis for: '" + unknownText1 + "'");
+                results1.forEach((lang, score) -> System.out.printf("%s: %.2f%%\n", lang, score));
+
+                String unknownText2 = "Una frase en español.";
+                HashMap<String, Double> results2 = languageModel.analyze(unknownText2);
+                System.out.println("\nAnalysis for: '" + unknownText2 + "'");
+                results2.forEach((lang, score) -> System.out.printf("%s: %.2f%%\n", lang, score));
+
+                String unknownText3 = "The quick brown fox.";
+                HashMap<String, Double> results3 = languageModel.analyze(unknownText3);
+                System.out.println("\nAnalysis for: '" + unknownText3 + "'");
+                results3.forEach((lang, score) -> System.out.printf("%s: %.2f%%\n", lang, score));
+
+                String unknownText4 = "Hola mundo.";
+                HashMap<String, Double> results4 = languageModel.analyze(unknownText4);
+                System.out.println("\nAnalysis for: '" + unknownText4 + "'");
+                results4.forEach((lang, score) -> System.out.printf("%s: %.2f%%\n", lang, score));
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}

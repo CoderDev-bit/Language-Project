@@ -64,8 +64,25 @@ public class CaesarToolTab extends BaseTab {
         add(execute);
         add(Box.createRigidArea(new Dimension(0, 10)));
         outputScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
-        add(outputScroll);
+        content.add(outputScroll);
 
+        execute.addActionListener(e -> {
+            //CipherEngine.extract();
+            String out = "";
+            int getProcess = mode.getSelectedIndex();
 
+            if (getProcess  == 0) {
+                out = CipherEngine.encrypt(input.getText(), Integer.parseInt(keyField.getText()));
+            } else {
+                out = CipherEngine.decrypt(input.getText(), -(Integer.parseInt(keyField.getText())));
+            }
+
+            output.setText(out);
+        });
+
+        add(content, BorderLayout.CENTER);
+        this.revalidate();
+        this.repaint();
     }
+
 }

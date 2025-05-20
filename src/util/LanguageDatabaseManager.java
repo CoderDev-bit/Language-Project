@@ -15,35 +15,73 @@ public class LanguageDatabaseManager extends DatabaseManager {
     }
 
     // Method to get word property
+// Method to get word property
     public String getWordProperty(String language, String word, String property) throws IOException {
         validateInputs(language, word, property);
 
         String sanitizedLanguage = language.trim();
         String sanitizedWord = word.trim();
 
-        String filter = String.format("?language=ilike.%s&word=ilike.%s", sanitizedLanguage, sanitizedWord);
+        // --- CHANGE HERE: Add URL Encoding ---
+        String encodedLanguage;
+        String encodedWord;
+        try {
+            encodedLanguage = URLEncoder.encode(sanitizedLanguage, StandardCharsets.UTF_8.name());
+            encodedWord = URLEncoder.encode(sanitizedWord, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            // This should not happen with UTF-8
+            throw new IOException("Failed to URL encode parameters", e);
+        }
+
+        String filter = String.format("?language=ilike.%s&word=ilike.%s", encodedLanguage, encodedWord);
+        // --- END CHANGE ---
 
         String response = readRows("words", filter);
         if (response != null && !response.trim().isEmpty()) {
+            // The "No such property found!" error indicates that 'extractColumn'
+            // cannot find 'property' (e.g., "percent_freq") in the 'response' JSON.
+            // This means either:
+            // 1. The property name specified by LanguageModel ("percent_freq") is incorrect.
+            // 2. The RPC functions (updateAllWordsPercentFreq) are not creating/populating this property.
+            // This part of the code is logically trying to do the right thing,
+            // but depends on the data being available under the correct 'property' name.
             return extractColumn(response, property);
         }
-        throw new IOException("Word property not found for " + word + " in language " + language);
+        // This specific exception is thrown if the entire 'response' is empty,
+        // meaning the word itself wasn't found, not just a property of it.
+        throw new IOException("Word property not found (or empty response) for " + word + " in language " + language);
     }
 
     // Method to get character property
+// Method to get character property
     public String getCharacterProperty(String language, String character, String property) throws IOException {
-        validateInputs(language, character, property);
+        validateInputs(language, character, property); // 'character' is already a String here
 
         String sanitizedLanguage = language.trim();
-        String sanitizedCharacter = character.trim();
+        String sanitizedCharacter = character.trim(); // 'character' is the (potentially mapped) string key
 
-        String filter = String.format("?language=ilike.%s&character=ilike.%s", sanitizedLanguage, sanitizedCharacter);
+        // --- CHANGE HERE: Add URL Encoding ---
+        String encodedLanguage;
+        String encodedCharacter;
+        try {
+            encodedLanguage = URLEncoder.encode(sanitizedLanguage, StandardCharsets.UTF_8.name());
+            encodedCharacter = URLEncoder.encode(sanitizedCharacter, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            // This should not happen with UTF-8
+            throw new IOException("Failed to URL encode parameters", e);
+        }
+
+        String filter = String.format("?language=ilike.%s&character=ilike.%s", encodedLanguage, encodedCharacter);
+        // --- END CHANGE ---
 
         String response = readRows("characters", filter);
         if (response != null && !response.trim().isEmpty()) {
+            // Similar to getWordProperty, if "No such property found!" occurs,
+            // it means 'extractColumn' cannot find 'property' (e.g., "percent_freq")
+            // in the 'response' JSON returned for this character.
             return extractColumn(response, property);
         }
-        throw new IOException("Character property not found for " + character + " in language " + language);
+        throw new IOException("Character property not found (or empty response) for " + character + " in language " + language);
     }
 
     // Method to increment word absolute frequency
@@ -140,9 +178,8 @@ public class LanguageDatabaseManager extends DatabaseManager {
 
         // Parse the response to extract the list of unique languages using manual JSON parsing
         String[] languages = parseLanguagesFromResponse(response.toString());
-
-
         return languages;
+
     }
 
     private String[] parseLanguagesFromResponse(String response) throws IOException {
@@ -212,15 +249,6 @@ public class LanguageDatabaseManager extends DatabaseManager {
 
         return languages;
     }
-
-
-
-
-
-
-
-
-
 
 
 
