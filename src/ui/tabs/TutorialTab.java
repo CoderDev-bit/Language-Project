@@ -5,8 +5,6 @@ import java.awt.*;
 
 public class TutorialTab extends BaseTab{
 
-    private static final String strVideoLink = "https://www.youtube.com/watch?v=8yh9BPUBbbQ";
-
     public TutorialTab() {
         initTab();
     }
@@ -35,7 +33,8 @@ public class TutorialTab extends BaseTab{
                         "3. Encrypt/Decrypt text in the Caesar Tool tab.\n" +
                         "4. Crack unknown Caesar ciphers in Cracker.\n" +
                         "\n" +
-                        "This tool supports custom alphabets.\n";
+                        "This tool supports custom alphabets.\n" +
+                        "Video Tutorial Link: https://drive.google.com/file/d/1nMJ8-4YEKyl56_NO6ESrbPrAr9FakGlN/view?usp=sharing\n";
 
         JTextArea tutorialText = new JTextArea(tutorialMessage);
         tutorialText.setFont(new Font("SansSerif", Font.PLAIN, 14));
