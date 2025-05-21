@@ -1,3 +1,28 @@
+/**************************************************************************
+ * File name:
+ * DatabaseManager.java
+ *
+ * Description:
+ * This file defines the abstract DatabaseManager class, which provides
+ * a foundational layer for interacting with a Supabase database. It handles
+ * common HTTP operations like inserting and reading rows, managing API keys,
+ * and includes a robust logging mechanism for tracking events and errors.
+ *
+ * Author:
+ * Shivam Patel
+ *
+ * Date: May 20 2025
+ *
+ * Concepts:
+ * HTTP client for REST API communication
+ * Supabase API integration
+ * Request/response handling
+ * Error management
+ * Event logging (in-memory and to file)
+ * Thread safety with locks for file operations
+ * URL and URI manipulation
+ *
+ *************************************************************************/
 package util;
 
 import java.io.*;
@@ -24,6 +49,26 @@ public class DatabaseManager {
     protected Path logFilePath = null; // Null means no file logging
     protected final Lock fileLogLock = new ReentrantLock(); // For thread-safe file writing
 
+    /**************************************************************************
+     * Method name:
+     * DatabaseManager
+     *
+     * Description:
+     * Constructor for the DatabaseManager. Initializes the database URL and API key.
+     *
+     * Parameters:
+     * @param baseUrl The base URL of the Supabase project.
+     * @param apiKey The API key for authenticating with the Supabase project.
+     *
+     * Throws:
+     * IllegalArgumentException if baseUrl or apiKey are null, or if baseUrl is a malformed URL.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public DatabaseManager(String baseUrl, String apiKey) {
         try {
             this.urlDatabase = new URL(Objects.requireNonNull(baseUrl));
@@ -34,6 +79,25 @@ public class DatabaseManager {
         }
     }
 
+    /**************************************************************************
+     * Method name:
+     * setBaseUrl
+     *
+     * Description:
+     * Sets the base URL for database operations using a String.
+     *
+     * Parameters:
+     * @param baseUrl The new base URL as a String.
+     *
+     * Throws:
+     * IllegalArgumentException if the provided URL string is malformed.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public void setBaseUrl(String baseUrl) {
         try {
             setBaseUrl(new URL(baseUrl));
@@ -43,15 +107,70 @@ public class DatabaseManager {
         }
     }
 
+    /**************************************************************************
+     * Method name:
+     * setBaseUrl
+     *
+     * Description:
+     * Sets the base URL for database operations using a URL object.
+     *
+     * Parameters:
+     * @param newUrl The new base URL as a URL object.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public void setBaseUrl(URL newUrl) {
         this.urlDatabase = Objects.requireNonNull(newUrl);
         logEvent("Base URL set to: " + newUrl);
     }
 
+    /**************************************************************************
+     * Method name:
+     * getBaseUrl
+     *
+     * Description:
+     * Retrieves the current base URL configured for the database manager.
+     *
+     * Returns:
+     * The current base URL as a URL object.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public URL getBaseUrl() {
         return urlDatabase;
     }
 
+    /**************************************************************************
+     * Method name:
+     * insertRow
+     *
+     * Description:
+     * Inserts a new row into the specified database table.
+     *
+     * Parameters:
+     * @param table The name of the table to insert into.
+     * @param json The JSON string representing the row data to be inserted.
+     *
+     * Returns:
+     * The HTTP response code of the insert operation.
+     *
+     * Throws:
+     * IOException if an I/O error occurs during the HTTP request.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public int insertRow(String table, String json) throws IOException {
         Objects.requireNonNull(table);
         Objects.requireNonNull(json);
@@ -66,6 +185,29 @@ public class DatabaseManager {
         return code;
     }
 
+    /**************************************************************************
+     * Method name:
+     * readRows
+     *
+     * Description:
+     * Reads rows from the specified database table, optionally applying a filter.
+     *
+     * Parameters:
+     * @param table The name of the table to read from.
+     * @param filter An optional filter string to apply to the read operation (e.g., "?select=*").
+     *
+     * Returns:
+     * A String containing the JSON response from the database.
+     *
+     * Throws:
+     * IOException if an I/O error occurs or the HTTP response code is not OK.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public String readRows(String table, String filter) throws IOException {
         Objects.requireNonNull(table);
         String path = "/rest/v1/" + table + filter;
@@ -87,6 +229,31 @@ public class DatabaseManager {
         return res.toString();
     }
 
+    /**************************************************************************
+     * Method name:
+     * createConnection
+     *
+     * Description:
+     * Creates and configures an HttpURLConnection for a given path and HTTP method.
+     * Sets common request headers, including Content-Type, Accept, apikey, and Authorization.
+     * Handles method override for PATCH requests.
+     *
+     * Parameters:
+     * @param path The relative path for the HTTP request (e.g., "/rest/v1/table_name").
+     * @param method The HTTP method (e.g., "GET", "POST", "PATCH", "DELETE").
+     *
+     * Returns:
+     * A configured HttpURLConnection object.
+     *
+     * Throws:
+     * IOException if an I/O error occurs while opening the connection.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     protected HttpURLConnection createConnection(String path, String method) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(urlDatabase, path).openConnection();
 
@@ -172,6 +339,24 @@ public class DatabaseManager {
         }
     }
 
+    /**************************************************************************
+     * Method name:
+     * logEvent
+     *
+     * Description:
+     * Logs a formatted event message to both an in-memory string buffer and,
+     * if configured, to a specified log file. Logging only occurs if
+     * `isEventLoggingEnabled` is true. File logging is thread-safe.
+     *
+     * Parameters:
+     * @param msg The message string to be logged.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     protected void logEvent(String msg) {
         // Check if logging is enabled first
         if (!isEventLoggingEnabled) return; // Exit immediately if logging is not enabled
@@ -198,6 +383,30 @@ public class DatabaseManager {
         }
     }
 
+    /**************************************************************************
+     * Method name:
+     * createPostRequest
+     *
+     * Description:
+     * Creates and configures an HttpURLConnection for a POST request, including
+     * writing the provided JSON input string to the output stream of the connection.
+     *
+     * Parameters:
+     * @param path The relative path for the POST request.
+     * @param jsonInputString The JSON string to be sent in the request body.
+     *
+     * Returns:
+     * A configured HttpURLConnection object ready to send the POST request.
+     *
+     * Throws:
+     * IOException if an I/O error occurs during connection creation or writing the body.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     protected HttpURLConnection createPostRequest(String path, String jsonInputString) throws IOException {
         HttpURLConnection conn = createConnection(path, "POST");
         conn.setDoOutput(true);
@@ -208,7 +417,31 @@ public class DatabaseManager {
         return conn;
     }
 
-    // Common method for extracting properties from JSON response
+    /**************************************************************************
+     * Method name:
+     * extractColumn
+     *
+     * Description:
+     * Extracts a specific column (property) value from a JSON-like response string.
+     * This method assumes a simple JSON structure and provides a basic extraction
+     * mechanism. It might need refinement depending on the actual JSON response format.
+     *
+     * Parameters:
+     * @param response The JSON-like string response from which to extract the column.
+     * @param column The name of the column (property) to extract.
+     *
+     * Returns:
+     * The string value of the extracted column.
+     *
+     * Throws:
+     * IOException if the specified property is not found in the response.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     protected String extractColumn(String response, String column) throws IOException {
         // Assuming the response is a valid JSON-like string and we're looking for the property in it
         // You can refine the way the property is extracted, depending on the format of the response
@@ -231,7 +464,25 @@ public class DatabaseManager {
         throw new IOException("No such property found!");
     }
 
-    // Handle HTTP response error
+    /**************************************************************************
+     * Method name:
+     * handleErrorResponse
+     *
+     * Description:
+     * Reads and prints the error stream from an HttpURLConnection if an HTTP error occurs.
+     *
+     * Parameters:
+     * @param conn The HttpURLConnection object from which to read the error stream.
+     *
+     * Throws:
+     * IOException if an I/O error occurs while reading the error stream.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     protected void handleErrorResponse(HttpURLConnection conn) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), "utf-8"))) {
             StringBuilder errorResponse = new StringBuilder();
@@ -243,7 +494,26 @@ public class DatabaseManager {
         }
     }
 
-    // Input validation helper
+    /**************************************************************************
+     * Method name:
+     * validateInputs
+     *
+     * Description:
+     * A helper method to validate an array of input strings.
+     * It throws an IllegalArgumentException if any input string is null or empty after trimming.
+     *
+     * Parameters:
+     * @param inputs A variable number of String arguments to be validated.
+     *
+     * Throws:
+     * IllegalArgumentException if any input string is invalid.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     protected void validateInputs(String... inputs) throws IllegalArgumentException {
         for (String input : inputs) {
             if (input == null || input.trim().isEmpty()) {
@@ -252,7 +522,27 @@ public class DatabaseManager {
         }
     }
 
-    // Process HTTP response for success
+    /**************************************************************************
+     * Method name:
+     * processResponse
+     *
+     * Description:
+     * Processes the HTTP response from a connection. If the response code indicates
+     * success (HTTP_OK or HTTP_NO_CONTENT), it reads and prints the input stream.
+     * Otherwise, it calls `handleErrorResponse` to print the error details.
+     *
+     * Parameters:
+     * @param conn The HttpURLConnection object whose response is to be processed.
+     *
+     * Throws:
+     * IOException if an I/O error occurs during response processing.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     protected void processResponse(HttpURLConnection conn) throws IOException {
         int responseCode = conn.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
@@ -271,10 +561,24 @@ public class DatabaseManager {
         }
     }
 
-
+    /**************************************************************************
+     * Method name:
+     * getLog
+     *
+     * Description:
+     * Retrieves the accumulated in-memory log of events as a String.
+     *
+     * Returns:
+     * A String containing all logged events since the DatabaseManager was initialized
+     * or the log was last cleared/reset.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public String getLog() {
         return strLog.toString();
     }
-
-
 }

@@ -1,41 +1,116 @@
+/**************************************************************************
+ * File name:
+ * LanguageModel.java
+ *
+ * Description:
+ * This file implements the LanguageModel class, which is responsible for
+ * training language profiles based on text input and analyzing unknown text
+ * to determine its most likely language. It interacts with a LanguageDatabaseManager
+ * to store and retrieve language frequency data for words and characters.
+ *
+ * Author:
+ * Shivam Patel
+ *
+ * Date: May 20 2025
+ *
+ * Concepts:
+ * Language profile training (word and character frequencies)
+ * Language analysis and scoring
+ * Handling of word separators and noise characters
+ * Database interaction for persistent storage of language data
+ * Regular expressions for text processing
+ *
+ *************************************************************************/
 package lang;
 
 import util.LanguageDatabaseManager;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException; // For URLEncoder, though not used directly in this file
-import java.net.URLEncoder;                 // For URLEncoder, if you were to fix LDBM
-import java.nio.charset.StandardCharsets;   // For URLEncoder
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class LanguageModel {
 
     private LanguageDatabaseManager db;
 
-    // --- IMPORTANT: CONFIGURATION ---
-    // If your database stores percentage frequencies under a different name,
-    // change this constant to the correct property name.
     public static final String PERCENT_FREQ_PROPERTY_NAME = "%_freq";
-    // --- END CONFIGURATION ---
+    private static final boolean DETAILED_LOGGING_ENABLED = false;
 
-    private static final boolean DETAILED_LOGGING_ENABLED = true; // Toggle for detailed logs
-
+    /**************************************************************************
+     * Method name:
+     * LanguageModel
+     *
+     * Description:
+     * Constructor for the LanguageModel class.
+     * Initializes the model with a LanguageDatabaseManager instance.
+     *
+     * Parameters:
+     * @param db The LanguageDatabaseManager instance to be used for database operations.
+     *
+     * Throws:
+     * IllegalArgumentException if the provided LanguageDatabaseManager is null.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public LanguageModel(LanguageDatabaseManager db) {
         if (db == null) {
             throw new IllegalArgumentException("LanguageDatabaseManager cannot be null.");
         }
         this.db = db;
-
     }
 
+    /**************************************************************************
+     * Method name:
+     * log
+     *
+     * Description:
+     * A private helper method for logging messages to the console if detailed logging
+     * is enabled. This helps in debugging and understanding the flow of the model.
+     *
+     * Parameters:
+     * @param message The string message to be logged.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     private void log(String message) {
         if (DETAILED_LOGGING_ENABLED) {
             System.out.println("[LOG] " + message);
         }
     }
 
+    /**************************************************************************
+     * Method name:
+     * mapCharacterToStringKey
+     *
+     * Description:
+     * Maps special characters (like space, tab, newline) to unique string keys
+     * for consistent storage in the database. Other characters are returned as their
+     * string representation. Includes a warning for unusual whitespace characters
+     * that might cause issues.
+     *
+     * Parameters:
+     * @param c The character to be mapped.
+     *
+     * Returns:
+     * A string key representation of the character.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     private String mapCharacterToStringKey(char c) {
         switch (c) {
             case ' ': return "_SPACE_";
@@ -43,10 +118,47 @@ public class LanguageModel {
             case '\n': return "_NEWLINE_";
             case '\r': return "_CARRIAGE_RETURN_";
             default:
-                return String.valueOf(c);
+                String val = String.valueOf(c);
+                // This check is a safeguard. Most non-whitespace printable characters
+                // will not trim to empty. If a character `c` is not one of the above
+                // explicitly mapped ones, but String.valueOf(c) *still* trims to empty
+                // (e.g., some unusual Unicode whitespace), it could fail DB validation
+                // if not uniquely mapped. For now, assuming this switch covers common cases.
+                if (!val.isEmpty() && val.trim().isEmpty()) {
+                    log("[WARN] Character 'U+" + Integer.toHexString(c) + "' (string: \"" + val.replace("\n", "\\n").replace("\t", "\\t") + "\") " +
+                            "is not explicitly mapped but its string representation trims to empty. " +
+                            "This might cause database issues if it's stored. Consider mapping it if errors occur for this character type.");
+                }
+                return val;
         }
     }
 
+    /**************************************************************************
+     * Method name:
+     * train
+     *
+     * Description:
+     * Trains a language model based on the provided text for a specified language.
+     * It calculates word and character frequencies, considering given word separators,
+     * and stores these frequencies in the database. Characters defined as explicit
+     * single-character word separators will be excluded from character frequency training.
+     *
+     * Parameters:
+     * @param strLanguageName The name of the language to be trained.
+     * @param strText The text content to be used for training.
+     * @param wordSeparators An array of strings defining the word separators. If empty,
+     * words are split by whitespace.
+     *
+     * Throws:
+     * IllegalArgumentException if language name or word separators are null or invalid.
+     * IOException if there is an error during database operations.
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public void train(String strLanguageName, String strText, String[] wordSeparators) throws IOException {
         log("--- Training Started for Language: " + strLanguageName + " ---");
         if (strLanguageName == null || strLanguageName.trim().isEmpty()) {
@@ -56,7 +168,7 @@ public class LanguageModel {
             strText = "";
         }
         if (wordSeparators == null) {
-            throw new IllegalArgumentException("Word separators array cannot be null.");
+            throw new IllegalArgumentException("Word separators array cannot be null. Pass an empty array if no specific separators are defined beyond default splitting by whitespace for words.");
         }
 
         String lang = strLanguageName.trim();
@@ -66,6 +178,8 @@ public class LanguageModel {
         Map<String, Integer> wordFrequencies = new HashMap<>();
         String trainingWordSplitRegex;
         if (wordSeparators.length == 0) {
+            // If no separators are explicitly provided, default to splitting words by whitespace.
+            // This also implies no characters are designated as *explicit* single-char separators for char exclusion.
             trainingWordSplitRegex = "\\s+";
         } else {
             StringBuilder sb = new StringBuilder();
@@ -77,7 +191,7 @@ public class LanguageModel {
                     sb.append(Pattern.quote(sep));
                 }
             }
-            if (sb.length() == 0) {
+            if (sb.length() == 0) { // All separators in the array were null/empty
                 trainingWordSplitRegex = "\\s+";
             } else {
                 trainingWordSplitRegex = sb.toString();
@@ -93,15 +207,34 @@ public class LanguageModel {
         }
         log("Word Frequencies for '" + lang + "': " + wordFrequencies);
 
-        Map<Character, Integer> charOriginalFrequencies = new HashMap<>();
+        // Block comment: Determine which single characters are explicit separators for this training run.
+        Set<Character> explicitSingleCharSeparators = new HashSet<>();
+        for (String sep : wordSeparators) {
+            if (sep != null && sep.length() == 1) {
+                explicitSingleCharSeparators.add(sep.charAt(0));
+            }
+        }
+        log("Explicit single-character word separators for this training run (will be excluded from char training): " + explicitSingleCharSeparators);
+
+        // Block comment: Character frequency calculation.
+        // Only characters NOT in explicitSingleCharSeparators will be included.
+        Map<Character, Integer> characterFrequenciesToStore = new HashMap<>();
         for (char character : textToProcess.toCharArray()) {
-            charOriginalFrequencies.put(character, charOriginalFrequencies.getOrDefault(character, 0) + 1);
+            if (explicitSingleCharSeparators.contains(character)) {
+                log("Skipping character 'U+" + Integer.toHexString(character) + "' ('" + String.valueOf(character).replace("\n", "\\n").replace("\t", "\\t") + "') for character frequency training in '" + lang + "' because it's an explicit single-char wordSeparator for this run.");
+                continue;
+            }
+            // This character is NOT an explicit separator for this run, so its frequency is tracked.
+            // This includes space, tab, etc., if they were NOT in wordSeparators.
+            characterFrequenciesToStore.put(character, characterFrequenciesToStore.getOrDefault(character, 0) + 1);
         }
-        Map<String, Integer> mappedCharFrequenciesForLog = new HashMap<>();
-        for(Map.Entry<Character, Integer> entry : charOriginalFrequencies.entrySet()){
-            mappedCharFrequenciesForLog.put(mapCharacterToStringKey(entry.getKey()), entry.getValue());
+
+        Map<String, Integer> mappedCharacterFrequenciesForLog = new HashMap<>();
+        for(Map.Entry<Character,Integer> entry : characterFrequenciesToStore.entrySet()){
+            mappedCharacterFrequenciesForLog.put(mapCharacterToStringKey(entry.getKey()), entry.getValue());
         }
-        log("Mapped Character Frequencies for '" + lang + "': " + mappedCharFrequenciesForLog);
+        log("Character Frequencies to be stored (mapped keys, excluding explicit single-char separators) for '" + lang + "': " + mappedCharacterFrequenciesForLog);
+
 
         log("Incrementing word absolute frequencies for '" + lang + "'...");
         for (Map.Entry<String, Integer> entry : wordFrequencies.entrySet()) {
@@ -112,10 +245,10 @@ public class LanguageModel {
             }
         }
 
-        log("Incrementing character absolute frequencies (using mapped keys) for '" + lang + "'...");
-        for (Map.Entry<Character, Integer> entry : charOriginalFrequencies.entrySet()) {
+        log("Incrementing character absolute frequencies for '" + lang + "'...");
+        for (Map.Entry<Character, Integer> entry : characterFrequenciesToStore.entrySet()) {
             char originalChar = entry.getKey();
-            String charKey = mapCharacterToStringKey(originalChar);
+            String charKey = mapCharacterToStringKey(originalChar); // Map key for DB compatibility
             try {
                 this.db.incrementCharacterAbsFreq(lang, charKey, entry.getValue());
             } catch (IOException e) {
@@ -143,6 +276,33 @@ public class LanguageModel {
         log("--- Training Ended for Language: " + lang + " ---");
     }
 
+    /**************************************************************************
+     * Method name:
+     * analyze
+     *
+     * Description:
+     * Analyzes the given text to determine the most likely language(s) based on
+     * stored language profiles. It calculates a raw score for each known language
+     * by comparing the input text's word and character frequencies against the
+     * trained profiles, and then converts these raw scores into percentages.
+     *
+     * Parameters:
+     * @param strText The text to be analyzed for language detection.
+     *
+     * Returns:
+     * A HashMap where keys are language names (String) and values are
+     * the percentage likelihood (Double) that the input text belongs to that language.
+     * Returns an empty map if no text is provided or no languages are stored.
+     *
+     * Throws:
+     * IOException if there is an error during database operations (e.g., fetching stored languages).
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public HashMap<String, Double> analyze(String strText) throws IOException {
         log("\n--- Analysis Started for Text: \"" + strText.replace("\n", "\\n").replace("\t", "\\t") + "\" ---");
         if (strText == null) {
@@ -164,6 +324,10 @@ public class LanguageModel {
         }
         log("Analysis: Input Text Word Frequencies: " + inputWordFreq);
 
+        // For analysis, count all characters from input text.
+        // Their mapped keys will be used for lookup. If a character was an
+        // explicit separator for a specific language during its training,
+        // the lookup for that char_key in that language's DB profile will naturally fail.
         Map<Character, Integer> inputCharOriginalFreq = new HashMap<>();
         for (char character : textToAnalyze.toCharArray()) {
             inputCharOriginalFreq.put(character, inputCharOriginalFreq.getOrDefault(character, 0) + 1);
@@ -172,7 +336,7 @@ public class LanguageModel {
         for(Map.Entry<Character, Integer> entry : inputCharOriginalFreq.entrySet()){
             inputMappedCharFreqForLog.put(mapCharacterToStringKey(entry.getKey()), entry.getValue());
         }
-        log("Analysis: Input Text Mapped Character Frequencies: " + inputMappedCharFreqForLog);
+        log("Analysis: Input Text Mapped Character Frequencies (keys for lookup): " + inputMappedCharFreqForLog);
 
         String[] storedLanguages;
         try {
@@ -201,6 +365,8 @@ public class LanguageModel {
             }
             log("--- Scoring for Language: " + lang + " ---");
             double currentLangScore = 0.0;
+            double wordScoreContribution = 0.0;
+            double charScoreContribution = 0.0;
 
             log("Calculating word-based score for " + lang + "...");
             for (Map.Entry<String, Integer> entry : inputWordFreq.entrySet()) {
@@ -215,24 +381,23 @@ public class LanguageModel {
                         try {
                             double parsedFreq = Double.parseDouble(freqStr);
                             log("Parsed frequency for word '" + word + "': " + parsedFreq);
-                            currentLangScore += countInInput * parsedFreq;
+                            wordScoreContribution += countInInput * parsedFreq;
                         } catch (NumberFormatException nfe) {
                             System.err.println("[WARN] Analysis: Could not parse word frequency '" + freqStr + "' for word '" + word + "' in language '" + lang + "'.");
                         }
                     } else {
-                        log("Frequency string for word '" + word + "' is null or empty for lang '" + lang + "'.");
+                        log("Frequency string for word '" + word + "' was null or empty for lang '" + lang + "' (before parsing).");
                     }
-                } catch (IOException e) { // This is where "No such property found!" or HTTP 400 would be caught
-                    log("IOException while getting property for word '" + word + "' in '" + lang + "': " + e.getMessage() + ". Assuming 0 frequency.");
+                } catch (IOException e) {
+                    log("IOException while getting property for word '" + word + "' in '" + lang + "': " + e.getMessage() + ". Assuming 0 frequency contribution.");
                 }
             }
-            log("Word-based score component for " + lang + ": " + currentLangScore);
+            log("Word-based score component for " + lang + ": " + wordScoreContribution);
 
-            double charScoreComponentStart = currentLangScore;
             log("Calculating character-based score for " + lang + "...");
             for (Map.Entry<Character, Integer> entry : inputCharOriginalFreq.entrySet()) {
                 char originalChar = entry.getKey();
-                String charKey = mapCharacterToStringKey(originalChar);
+                String charKey = mapCharacterToStringKey(originalChar); // Map the input character to its DB key
                 int countInInput = entry.getValue();
                 String freqStr = null;
                 try {
@@ -243,18 +408,20 @@ public class LanguageModel {
                         try {
                             double parsedFreq = Double.parseDouble(freqStr);
                             log("Parsed frequency for char_key '" + charKey + "': " + parsedFreq);
-                            currentLangScore += countInInput * parsedFreq;
+                            charScoreContribution += countInInput * parsedFreq;
                         } catch (NumberFormatException nfe) {
                             System.err.println("[WARN] Analysis: Could not parse char frequency '" + freqStr + "' for char key '" + charKey + "' (original: '" + originalChar + "') in language '" + lang + "'.");
                         }
                     } else {
-                        log("Frequency string for char_key '" + charKey + "' is null or empty for lang '" + lang + "'.");
+                        log("Frequency string for char_key '" + charKey + "' was null or empty for lang '" + lang + "' (before parsing).");
                     }
-                } catch (IOException e) { // This is where "No such property found!" or HTTP 400 would be caught
-                    log("IOException while getting property for char_key '" + charKey + "' in '" + lang + "': " + e.getMessage() + ". Assuming 0 frequency.");
+                } catch (IOException e) {
+                    log("IOException while getting property for char_key '" + charKey + "' in '" + lang + "': " + e.getMessage() + ". Assuming 0 frequency contribution.");
                 }
             }
-            log("Character-based score component for " + lang + ": " + (currentLangScore - charScoreComponentStart));
+            log("Character-based score component for " + lang + ": " + charScoreContribution);
+
+            currentLangScore = wordScoreContribution + charScoreContribution;
             log("Total raw score for " + lang + ": " + currentLangScore);
             languageRawScores.put(lang, currentLangScore);
             totalScoreSum += currentLangScore;
@@ -274,7 +441,7 @@ public class LanguageModel {
                 resultPercentages.put(entry.getKey(), (entry.getValue() / totalScoreSum) * 100.0);
             }
         } else {
-            log("Analysis: TotalScoreSum is 0 or less. Setting all percentages to 0.0.");
+            log("Analysis: TotalScoreSum is 0 or less. Setting all percentages to 0.0 for " + languageRawScores.size() + " language(s).");
             for (String langKey : languageRawScores.keySet()) {
                 resultPercentages.put(langKey, 0.0);
             }
@@ -284,6 +451,25 @@ public class LanguageModel {
         return resultPercentages;
     }
 
+    /**************************************************************************
+     * Method name:
+     * main
+     *
+     * Description:
+     * The main method for demonstrating the LanguageModel's training and analysis
+     * functionalities. It initializes a LanguageDatabaseManager, creates a
+     * LanguageModel, and then performs various training and analysis operations
+     * with different language texts and separator configurations.
+     *
+     * Parameters:
+     * @param args Command line arguments (not used in this demonstration).
+     *
+     * Author:
+     * Shivam Patel
+     *
+     * Date: May 20 2025
+     *
+     *************************************************************************/
     public static void main(String[] args) {
         LanguageDatabaseManager dbInstance = null;
         try {
@@ -302,58 +488,55 @@ public class LanguageModel {
         System.out.println("LanguageModel instance created.");
 
         try {
-            String[] separators = {" ", ",", ".", ";", ":", "!", "?", "(", ")", "\n", "\t", "-"};
+            // Separators for English, French, Spanish will cause these single chars
+            // (space, comma, period, etc.) to be EXCLUDED from character training for these languages.
+            String[] commonSeparators = {" ", ",", ".", ";", ":", "!", "?", "(", ")", "\n", "\t", "-"};
+
+            // For testlang, only space is a separator. So comma, period etc. WOULD be trained as chars if present in its text.
+            String[] testLangSeparators = {" "};
+
+            // For lang_alpha_space, NO separators are given in the array.
+            // wordSeparators.length == 0 will make word splitting default to "\\s+".
+            // For character training, NO character will be in `explicitSingleCharSeparators`.
+            // Thus, ' ' (space) encountered in its training text WILL BE stored (as "_SPACE_").
+            String[] noExplicitSeparators = {};
+
 
             System.out.println("\nStarting training for English (via main)...");
-            model.train("english", "Hello world, this is a sample text.\nHello again, world of wonders.\tTest tab.", separators);
+            model.train("english", "Half newton Hello world, this is a sample text.\nHello again, world of wonders.\tTest tab.", commonSeparators);
             System.out.println("English training complete (via main).");
 
             System.out.println("\nStarting training for French (via main)...");
-            model.train("french", "Bonjour le monde. Ceci est un texte d'exemple.\nBonjour encore, monde des merveilles.\tOnglet de test.", separators);
+            model.train("french", "Bonjour le monde. Ceci est un texte d'exemple.\nBonjour encore, monde des merveilles.\tOnglet de test.", commonSeparators);
             System.out.println("French training complete (via main).");
 
             System.out.println("\nStarting training for Spanish (via main)...");
-            model.train("spanish", "Hola mundo, este es un texto de ejemplo.\nHola de nuevo, mundo de maravillas.\tPestaña de prueba.", separators);
+            model.train("spanish", "Hola mundo, este es un texto de ejemplo.\nHola de nuevo, mundo de maravillas.\tPestaña de prueba.", commonSeparators);
             System.out.println("Spanish training complete (via main).");
 
             System.out.println("\nStarting training for TestLang (simple) (via main)...");
-            model.train("testlang", "aaa bbb aaa cc aaa bbb", new String[]{" "});
+            model.train("testlang", "aaa bbb aaa cc aaa bbb", testLangSeparators);
             System.out.println("TestLang training complete (via main).");
+
+            System.out.println("\nStarting training for lang_alpha_space (space is a char)...");
+            model.train("lang_alpha_space", "word1 word2 space is char . comma,test", noExplicitSeparators);
+            System.out.println("lang_alpha_space training complete.");
+
 
             String unknownText1 = "Hello, this feels like an English text.";
             HashMap<String, Double> analysisResult1 = model.analyze(unknownText1);
             System.out.println("\nAnalysis for '" + unknownText1 + "': " + analysisResult1);
 
-            String unknownText2 = "Bonjour, ceci est une phrase en français.";
-            HashMap<String, Double> analysisResult2 = model.analyze(unknownText2);
-            System.out.println("Analysis for '" + unknownText2 + "': " + analysisResult2);
+            String alphaSpaceText = "word1 space"; // Contains ' ' which should be found if lang_alpha_space was trained correctly
+            System.out.println("\nAnalyzing text for lang_alpha_space: '" + alphaSpaceText + "'");
+            HashMap<String, Double> analysisAlphaSpace = model.analyze(alphaSpaceText);
+            System.out.println("Analysis for lang_alpha_space text: " + analysisAlphaSpace);
 
-            String unknownText3 = "Hola, este es un texto en español.";
-            HashMap<String, Double> analysisResult3 = model.analyze(unknownText3);
-            System.out.println("Analysis for '" + unknownText3 + "': " + analysisResult3);
+            String commaTextForAlphaSpace = "word1, test"; // ',' should be a character for lang_alpha_space
+            System.out.println("\nAnalyzing comma text for lang_alpha_space: '" + commaTextForAlphaSpace + "'");
+            HashMap<String, Double> analysisCommaText = model.analyze(commaTextForAlphaSpace);
+            System.out.println("Analysis for comma text for lang_alpha_space: " + analysisCommaText);
 
-            String mixedText = "Hello world.\nBonjour le monde.\tHola mundo.";
-            HashMap<String, Double> analysisResultMixed = model.analyze(mixedText);
-            System.out.println("Analysis for '" + mixedText + "': " + analysisResultMixed);
-
-            String shortGibberish = "asdf qwer zxcv";
-            HashMap<String, Double> analysisResultGibberish = model.analyze(shortGibberish);
-            System.out.println("Analysis for '" + shortGibberish + "': " + analysisResultGibberish);
-
-            String textWithTabsAndNewlines = "This\thas\nvarious whitespace.";
-            System.out.println("\nAnalyzing text with special whitespace: '" + textWithTabsAndNewlines.replace("\t", "\\t").replace("\n", "\\n") + "'");
-            HashMap<String, Double> analysisWhitespace = model.analyze(textWithTabsAndNewlines);
-            System.out.println("Analysis for text with special whitespace: " + analysisWhitespace);
-
-            String testLangText = "aaa";
-            System.out.println("\nAnalyzing text for TestLang: '" + testLangText + "'");
-            HashMap<String, Double> analysisTestLang = model.analyze(testLangText);
-            System.out.println("Analysis for TestLang text: " + analysisTestLang);
-
-            String testLangTextMultiple = "aaa bbb aaa";
-            System.out.println("\nAnalyzing text for TestLang (multiple): '" + testLangTextMultiple + "'");
-            HashMap<String, Double> analysisTestLangMultiple = model.analyze(testLangTextMultiple);
-            System.out.println("Analysis for TestLang text (multiple): " + analysisTestLangMultiple);
 
         } catch (IOException e) {
             System.err.println("\nAn error occurred during model training or analysis: " + e.getMessage());
